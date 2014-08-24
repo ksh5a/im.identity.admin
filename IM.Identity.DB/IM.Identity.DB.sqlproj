@@ -72,6 +72,7 @@
     <Build Include="Tables\AspNetUserRoles.sql" />
     <Build Include="Tables\AspNetUsers.sql" />
     <None Include="Scripts\Principal.sql" />
+    <None Include="Publish\IM.Identity.DB.publish.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Publish\IM.Identity.DB.Local.publish.xml" />
