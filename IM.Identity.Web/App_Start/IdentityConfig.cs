@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using IM.Identity.BI.Edm;
+using IM.Identity.BI.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
