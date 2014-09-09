@@ -1,24 +1,28 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 using IM.Identity.BI.Edm;
-using IM.Identity.BI.Service.Interface;
+using IM.Identity.BI.Repository.Interface;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Ninject;
 
-namespace IM.Identity.BI.Service
+namespace IM.Identity.BI.Repository
 {
-    public class RolesService : IEntityService
+    public class RolesRepository : BaseRepository, IIdentityRepository<IdentityRole>
     {
-        public async Task<List<IdentityRole>> Get()
+        [Inject]
+        public RolesRepository(ApplicationDbContext context)
+            : base(context)
         {
-            using (var context = new ApplicationDbContext())
-            {
-                var roleManager = GetRoleManager(context);
-                var roles = roleManager.Roles;
+        }
 
-                return await roles.ToListAsync();
-            }
+        public IQueryable<IdentityRole> Get()
+        {
+            var roleManager = GetRoleManager(Context);
+            var roles = roleManager.Roles;
+                
+            return roles;
         }
 
         public async Task<IdentityRole> Get(string id)
@@ -41,7 +45,7 @@ namespace IM.Identity.BI.Service
 
                 if (!roleManager.RoleExists(role.Name))
                 {
-                    result = await roleManager.CreateAsync(new IdentityRole(role.Name));
+                    result = await roleManager.CreateAsync(role);
                 }
 
                 return result;
@@ -53,7 +57,7 @@ namespace IM.Identity.BI.Service
             using (var context = new ApplicationDbContext())
             {
                 var roleManager = GetRoleManager(context);
-                var result = await roleManager.UpdateAsync(new IdentityRole(role.Name));
+                var result = await roleManager.UpdateAsync(role);
 
                 return result;
             }
@@ -64,13 +68,13 @@ namespace IM.Identity.BI.Service
             using (var context = new ApplicationDbContext())
             {
                 var roleManager = GetRoleManager(context);
-                var result = await roleManager.DeleteAsync(new IdentityRole(role.Name));
+                var result = await roleManager.DeleteAsync(role);
 
                 return result;
             }
         }
 
-        protected RoleManager<IdentityRole> GetRoleManager(DbContext context)
+        private RoleManager<IdentityRole> GetRoleManager(DbContext context)
         {
             var roleStore = new RoleStore<IdentityRole>(context);
             var roleManager = new RoleManager<IdentityRole>(roleStore);

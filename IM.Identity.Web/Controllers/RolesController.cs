@@ -1,23 +1,28 @@
-﻿using System.Data.Entity;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Net;
 using System.Web.Mvc;
-using IM.Identity.BI.Service;
-using IM.Identity.BI.Service.Manager;
+using IM.Identity.BI.Repository.Interface;
+using IM.Identity.BI.Repository.NInject;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Ninject;
 
 namespace IM.Identity.Web.Controllers
 {
     public class RolesController : Controller
     {
-        private IdentityDbContext db = new IdentityDbContext();
+        private readonly IIdentityRepository<IdentityRole> _rolesRepository;
+
+        public RolesController()
+        {
+            var kernel = new StandardKernel(new RepositoryModule());
+            _rolesRepository = kernel.Get<IIdentityRepository<IdentityRole>>();
+        }
 
         // GET: Roles
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
-            var rolesService = (RolesService)ServiceManager.GetServiceInstance(typeof(RolesService));
-            var roles = await rolesService.Get();
+            var roles = _rolesRepository.Get();
 
             return View(roles);
         }
@@ -30,8 +35,9 @@ namespace IM.Identity.Web.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var rolesService = (RolesService)ServiceManager.GetServiceInstance(typeof(RolesService));
-            var role = await rolesService.Get(id);
+            var kernel = new StandardKernel(new RepositoryModule());
+            var rolesRepository = kernel.Get<IIdentityRepository<IdentityRole>>();
+            var role = await rolesRepository.Get(id);
             if (role == null)
             {
                 return HttpNotFound();
@@ -55,11 +61,12 @@ namespace IM.Identity.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var rolesService = (RolesService)ServiceManager.GetServiceInstance(typeof(RolesService));
-                var result = await rolesService.Insert(aspNetRole);
+                var kernel = new StandardKernel(new RepositoryModule());
+                var rolesRepository = kernel.Get<IIdentityRepository<IdentityRole>>();
+                var result = await rolesRepository.Insert(aspNetRole);
                 if (!result.Succeeded)
                 {
-                    ModelState.AddModelError("", result.Errors.First().ToString());
+                    ModelState.AddModelError("", result.Errors.First());
                     return View();
                 }
                 return RedirectToAction("Index");
@@ -86,8 +93,8 @@ namespace IM.Identity.Web.Controllers
         // POST: Roles/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+//        [HttpPost]
+//        [ValidateAntiForgeryToken]
 //        public async Task<ActionResult> Edit([Bind(Include = "Id,Name")] AspNetRole aspNetRole)
 //        {
 //            if (ModelState.IsValid)
@@ -127,10 +134,8 @@ namespace IM.Identity.Web.Controllers
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                db.Dispose();
-            }
+            _rolesRepository.Dispose();
+
             base.Dispose(disposing);
         }
     }
