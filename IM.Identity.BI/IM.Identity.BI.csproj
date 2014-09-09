@@ -66,7 +66,6 @@
     <Compile Include="Repository\Interface\IIdentityRepository.cs" />
     <Compile Include="Repository\NInject\RepositoryModule.cs" />
     <Compile Include="Repository\RolesRepository.cs" />
-    <Compile Include="Repository\RepositoryUnitOfWork.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
