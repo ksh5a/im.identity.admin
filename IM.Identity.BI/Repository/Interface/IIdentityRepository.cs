@@ -15,6 +15,6 @@ namespace IM.Identity.BI.Repository.Interface
 
         Task<IdentityResult> Update(T entity);
 
-        Task<IdentityResult> Delete(T entity);
+        Task<IdentityResult> Delete(string id);
     }
 }

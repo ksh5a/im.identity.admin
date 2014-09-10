@@ -35,9 +35,7 @@ namespace IM.Identity.Web.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var kernel = new StandardKernel(new RepositoryModule());
-            var rolesRepository = kernel.Get<IIdentityRepository<IdentityRole>>();
-            var role = await rolesRepository.Get(id);
+            var role = await _rolesRepository.Get(id);
             if (role == null)
             {
                 return HttpNotFound();
@@ -61,9 +59,7 @@ namespace IM.Identity.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var kernel = new StandardKernel(new RepositoryModule());
-                var rolesRepository = kernel.Get<IIdentityRepository<IdentityRole>>();
-                var result = await rolesRepository.Insert(aspNetRole);
+                var result = await _rolesRepository.Insert(aspNetRole);
                 if (!result.Succeeded)
                 {
                     ModelState.AddModelError("", result.Errors.First());
@@ -75,62 +71,70 @@ namespace IM.Identity.Web.Controllers
             return View(aspNetRole);
         }
 
-        // GET: Roles/Edit/5
-//        public async Task<ActionResult> Edit(string id)
-//        {
-//            if (id == null)
-//            {
-//                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-//            }
-//            AspNetRole aspNetRole = await db.AspNetRoles.FindAsync(id);
-//            if (aspNetRole == null)
-//            {
-//                return HttpNotFound();
-//            }
-//            return View(aspNetRole);
-//        }
+        // GET: Roles/Edit/MyRole
+        public async Task<ActionResult> Edit(string id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            var role = await _rolesRepository.Get(id);
+            if (role == null)
+            {
+                return HttpNotFound();
+            }
+            return View(role);
+        }
+
 
         // POST: Roles/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public async Task<ActionResult> Edit([Bind(Include = "Id,Name")] AspNetRole aspNetRole)
-//        {
-//            if (ModelState.IsValid)
-//            {
-//                db.Entry(aspNetRole).State = EntityState.Modified;
-//                await db.SaveChangesAsync();
-//                return RedirectToAction("Index");
-//            }
-//            return View(aspNetRole);
-//        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit([Bind(Include = "Id,Name")] IdentityRole role)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _rolesRepository.Update(role);
+
+                if(result.Succeeded)
+                {
+                    return RedirectToAction("Index");
+                }
+            }
+
+            return View(role);
+        }
 
         // GET: Roles/Delete/5
-//        public async Task<ActionResult> Delete(string id)
-//        {
-//            if (id == null)
-//            {
-//                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-//            }
-//            AspNetRole aspNetRole = await db.AspNetRoles.FindAsync(id);
-//            if (aspNetRole == null)
-//            {
-//                return HttpNotFound();
-//            }
-//            return View(aspNetRole);
-//        }
+        public async Task<ActionResult> Delete(string id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            var role = await _rolesRepository.Get(id);
+
+            if (role == null)
+            {
+                return HttpNotFound();
+            }
+
+            return View(role);
+        }
 
         // POST: Roles/Delete/5
-//        [HttpPost, ActionName("Delete")]
-//        [ValidateAntiForgeryToken]
-//        public async Task<ActionResult> DeleteConfirmed(string id)
-//        {
-//            AspNetRole aspNetRole = await db.AspNetRoles.FindAsync(id);
-//            db.AspNetRoles.Remove(aspNetRole);
-//            await db.SaveChangesAsync();
-//            return RedirectToAction("Index");
-//        }
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> DeleteConfirmed(string id)
+        {
+            var result = await _rolesRepository.Delete(id);
+
+            return RedirectToAction("Index");
+        }
 
         protected override void Dispose(bool disposing)
         {

@@ -11,75 +11,55 @@ namespace IM.Identity.BI.Repository
 {
     public class RolesRepository : BaseRepository, IIdentityRepository<IdentityRole>
     {
+        private readonly RoleManager<IdentityRole> _roleManager;
+
         [Inject]
         public RolesRepository(ApplicationDbContext context)
             : base(context)
         {
+            var roleStore = new RoleStore<IdentityRole>(context);
+            _roleManager = new RoleManager<IdentityRole>(roleStore);
         }
 
         public IQueryable<IdentityRole> Get()
         {
-            var roleManager = GetRoleManager(Context);
-            var roles = roleManager.Roles;
+            var roles = _roleManager.Roles;
                 
             return roles;
         }
 
         public async Task<IdentityRole> Get(string id)
         {
-            using (var context = new ApplicationDbContext())
-            {
-                var roleManager = GetRoleManager(context);
-                var role = await roleManager.FindByIdAsync(id);
+            var role = await _roleManager.FindByIdAsync(id);
 
-                return role;
-            }
+            return role;
         }
 
         public async Task<IdentityResult> Insert(IdentityRole role)
         {
-            using (var context = new ApplicationDbContext())
+            var result = new IdentityResult();
+
+            if (!_roleManager.RoleExists(role.Name))
             {
-                var result = new IdentityResult();
-                var roleManager = GetRoleManager(context);
-
-                if (!roleManager.RoleExists(role.Name))
-                {
-                    result = await roleManager.CreateAsync(role);
-                }
-
-                return result;
+                result = await _roleManager.CreateAsync(role);
             }
+
+            return result;
         }
 
         public async Task<IdentityResult> Update(IdentityRole role)
         {
-            using (var context = new ApplicationDbContext())
-            {
-                var roleManager = GetRoleManager(context);
-                var result = await roleManager.UpdateAsync(role);
+            var result = await _roleManager.UpdateAsync(role);
 
-                return result;
-            }
+            return result;
         }
 
-        public async Task<IdentityResult> Delete(IdentityRole role)
+        public async Task<IdentityResult> Delete(string id)
         {
-            using (var context = new ApplicationDbContext())
-            {
-                var roleManager = GetRoleManager(context);
-                var result = await roleManager.DeleteAsync(role);
+            var role = await Get(id);
+            var result = await _roleManager.DeleteAsync(role);
 
-                return result;
-            }
-        }
-
-        private RoleManager<IdentityRole> GetRoleManager(DbContext context)
-        {
-            var roleStore = new RoleStore<IdentityRole>(context);
-            var roleManager = new RoleManager<IdentityRole>(roleStore);
-
-            return roleManager;
+            return result;
         }
     }
 }
