@@ -2,32 +2,33 @@
 using System.Threading.Tasks;
 using System.Net;
 using System.Web.Mvc;
+using IM.Identity.BI.Models;
 using IM.Identity.BI.Repository.Interface;
 using IM.Identity.BI.Repository.NInject;
-using Microsoft.AspNet.Identity.EntityFramework;
+using IM.Identity.Web.Models;
 using Ninject;
 
 namespace IM.Identity.Web.Controllers
 {
-    public class RolesController : Controller
+    public class UsersController : Controller
     {
-        private readonly IIdentityRepository<IdentityRole> _rolesRepository;
+        private readonly IUserIdentityRepository<ApplicationUser> _usersRepository;
 
-        public RolesController()
+        public UsersController()
         {
             var kernel = new StandardKernel(new RepositoryModule());
-            _rolesRepository = kernel.Get<IIdentityRepository<IdentityRole>>();
+            _usersRepository = kernel.Get<IUserIdentityRepository<ApplicationUser>>();
         }
 
-        // GET: Roles
+        // GET: Users
         public ActionResult Index()
         {
-            var roles = _rolesRepository.Get();
+            var users = _usersRepository.Get();
 
-            return View(roles);
+            return View(users);
         }
 
-        // GET: Roles/Details/5
+        // GET: Users/Details/5
         public async Task<ActionResult> Details(string id)
         {
             if (id == null)
@@ -35,31 +36,40 @@ namespace IM.Identity.Web.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var role = await _rolesRepository.Get(id);
-            if (role == null)
+            var user = await _usersRepository.Get(id);
+            if (user == null)
             {
                 return HttpNotFound();
             }
 
-            return View(role);
+            return View(user);
         }
 
-        // GET: Roles/Create
+        // GET: Users/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: Roles/Create
+        // POST: Users/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,Name")] IdentityRole aspNetRole)
+        public async Task<ActionResult> Create(UserViewModel userViewModel)
         {
             if (ModelState.IsValid)
             {
-                var result = await _rolesRepository.Insert(aspNetRole);
+                var user = new ApplicationUser
+                {
+                    UserName = userViewModel.UserName,
+                    Email = userViewModel.Email,
+                    PhoneNumber = userViewModel.PhoneNumber,
+                    TwoFactorEnabled = userViewModel.TwoFactorEnabled,
+                    LockoutEnabled = userViewModel.LockoutEnabled
+                };
+
+                var result = await _usersRepository.Insert(user, userViewModel.Password);
                 if (!result.Succeeded)
                 {
                     ModelState.AddModelError("", result.Errors.First());
@@ -69,10 +79,10 @@ namespace IM.Identity.Web.Controllers
                 return RedirectToAction("Index");
             }
 
-            return View(aspNetRole);
+            return View(userViewModel);
         }
 
-        // GET: Roles/Edit/MyRole
+        // GET: Users/Edit/5
         public async Task<ActionResult> Edit(string id)
         {
             if (id == null)
@@ -80,36 +90,42 @@ namespace IM.Identity.Web.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var role = await _rolesRepository.Get(id);
-            if (role == null)
+            var user = await _usersRepository.Get(id);
+            if (user == null)
             {
                 return HttpNotFound();
             }
-            return View(role);
+
+            return View(user);
         }
 
-
-        // POST: Roles/Edit/5
+        // POST: Users/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,Name")] IdentityRole role)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,UserName,Email,PhoneNumber,TwoFactorEnabled,LockoutEnabled")] ApplicationUser applicationUser)
         {
             if (ModelState.IsValid)
             {
-                var result = await _rolesRepository.Update(role);
+                var user = await _usersRepository.Get(applicationUser.Id);
+                user.UserName = applicationUser.UserName;
+                user.Email = applicationUser.Email;
+                user.PhoneNumber = applicationUser.PhoneNumber;
+                user.TwoFactorEnabled = applicationUser.TwoFactorEnabled;
+                user.LockoutEnabled = applicationUser.LockoutEnabled;
 
-                if(result.Succeeded)
+                var result = await _usersRepository.Update(user);
+                if (result.Succeeded)
                 {
                     return RedirectToAction("Index");
                 }
             }
 
-            return View(role);
+            return View(applicationUser);
         }
 
-        // GET: Roles/Delete/5
+        // GET: Users/Delete/5
         public async Task<ActionResult> Delete(string id)
         {
             if (id == null)
@@ -117,29 +133,28 @@ namespace IM.Identity.Web.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var role = await _rolesRepository.Get(id);
-
-            if (role == null)
+            var user = await _usersRepository.Get(id);
+            if (user == null)
             {
                 return HttpNotFound();
             }
 
-            return View(role);
+            return View(user);
         }
 
-        // POST: Roles/Delete/5
+        // POST: Users/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(string id)
         {
-            var result = await _rolesRepository.Delete(id);
+            var result = await _usersRepository.Delete(id);
 
             return RedirectToAction("Index");
         }
 
         protected override void Dispose(bool disposing)
         {
-            _rolesRepository.Dispose();
+            _usersRepository.Dispose();
 
             base.Dispose(disposing);
         }
