@@ -63,5 +63,12 @@ namespace IM.Identity.BI.Repository
 
             return result;
         }
+
+        public async Task<IdentityResult> AddToRole(string userId, string roleName)
+        {
+            var result = await _userManager.AddToRolesAsync(userId, roleName);
+
+            return result;
+        }
     }
 }

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using IM.Identity.Web;
 using IM.Identity.Web.Controllers;
 
 namespace IM.Identity.Web.Tests.Controllers
@@ -13,13 +8,13 @@ namespace IM.Identity.Web.Tests.Controllers
     public class HomeControllerTest
     {
         [TestMethod]
-        public void Index()
+        public async void Index()
         {
             // Arrange
             HomeController controller = new HomeController();
 
             // Act
-            ViewResult result = controller.Index() as ViewResult;
+            var result = await controller.Index();
 
             // Assert
             Assert.IsNotNull(result);

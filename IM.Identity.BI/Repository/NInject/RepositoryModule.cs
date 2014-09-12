@@ -11,6 +11,7 @@ namespace IM.Identity.BI.Repository.NInject
         {
             Bind<IIdentityRepository<IdentityRole>>().To<RolesRepository>();
             Bind<IUserIdentityRepository<ApplicationUser>>().To<UsersRepository>();
+            Bind<IRoleIdentityRepository<IdentityRole>>().To<RolesRepository>();
         }
     }
 }

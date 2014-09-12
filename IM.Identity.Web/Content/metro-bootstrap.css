@@ -1812,7 +1812,6 @@ input[type="month"].input-lg {
 .checkbox input[type="checkbox"],
 .checkbox-inline input[type="checkbox"] {
   position: absolute;
-  margin-left: -20px;
   margin-top: 4px \9;
 }
 .radio + .radio,
@@ -6390,7 +6389,6 @@ a.fa-links:focus {
 }
 .checkbox > input[type=checkbox] {
   position: absolute;
-  opacity: 0;
 }
 .checkbox .checkbox-label {
   padding-left: 28px;

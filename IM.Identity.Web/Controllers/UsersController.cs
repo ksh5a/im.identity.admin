@@ -21,6 +21,7 @@ namespace IM.Identity.Web.Controllers
         }
 
         // GET: Users
+        //[Authorize(Roles = "Admin")]
         public ActionResult Index()
         {
             var users = _usersRepository.Get();

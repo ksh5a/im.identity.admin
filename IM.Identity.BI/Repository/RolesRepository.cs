@@ -9,7 +9,7 @@ using Ninject;
 
 namespace IM.Identity.BI.Repository
 {
-    public class RolesRepository : BaseRepository, IIdentityRepository<IdentityRole>
+    public class RolesRepository : BaseRepository, IRoleIdentityRepository<IdentityRole>
     {
         private readonly RoleManager<IdentityRole> _roleManager;
 
@@ -20,6 +20,8 @@ namespace IM.Identity.BI.Repository
             var roleStore = new RoleStore<IdentityRole>(context);
             _roleManager = new RoleManager<IdentityRole>(roleStore);
         }
+
+        #region IIdentityRepository
 
         public IQueryable<IdentityRole> Get()
         {
@@ -61,5 +63,18 @@ namespace IM.Identity.BI.Repository
 
             return result;
         }
+
+        #endregion
+
+        #region IRoleIdentityRepository
+
+        public async Task<bool> RoleExists(string roleName)
+        {
+            var result = await _roleManager.RoleExistsAsync(roleName);
+
+            return result;
+        }
+
+        #endregion
     }
 }

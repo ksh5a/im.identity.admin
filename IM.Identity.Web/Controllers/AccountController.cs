@@ -1,31 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using IM.Identity.BI.Models;
+using IM.Identity.BI.Repository.Interface;
+using IM.Identity.BI.Repository.NInject;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
-using Owin;
 using IM.Identity.Web.Models;
+using Ninject;
 
 namespace IM.Identity.Web.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
+        #region Constants
+
+        private const string AdminRoleName = "Admin";
+
+        #endregion
+
+        private readonly IRoleIdentityRepository<IdentityRole> _rolesRepository;
+        private readonly IUserIdentityRepository<ApplicationUser> _usersRepository;
         private ApplicationUserManager _userManager;
 
         public AccountController()
         {
+            var kernel = new StandardKernel(new RepositoryModule());
+            _rolesRepository = kernel.Get<IRoleIdentityRepository<IdentityRole>>();
+            _usersRepository = kernel.Get<IUserIdentityRepository<ApplicationUser>>();
         }
 
         public AccountController(ApplicationUserManager userManager)
         {
+            var kernel = new StandardKernel(new RepositoryModule());
+            _rolesRepository = kernel.Get<IRoleIdentityRepository<IdentityRole>>();
+            _usersRepository = kernel.Get<IUserIdentityRepository<ApplicationUser>>();
+
             UserManager = userManager;
         }
 
@@ -77,8 +90,14 @@ namespace IM.Identity.Web.Controllers
         //
         // GET: /Account/Register
         [AllowAnonymous]
-        public ActionResult Register()
+        public async Task<ActionResult> Register()
         {
+            var roleExists = await _rolesRepository.RoleExists(AdminRoleName);
+            if (roleExists)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             return View();
         }
 
@@ -89,12 +108,32 @@ namespace IM.Identity.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+            var roleExists = await _rolesRepository.RoleExists("Admin");
+            if (roleExists)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
-                IdentityResult result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
+                var roleResult = await _rolesRepository.Insert(new IdentityRole(AdminRoleName));
+                if(!roleResult.Succeeded)
                 {
+                    AddErrors(new IdentityResult("Admin role could not be created"));
+                    return View(model);
+                }
+
+                var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
+                var userResult = await UserManager.CreateAsync(user, model.Password);
+                if (userResult.Succeeded)
+                {
+                    var addToRoleResult = await _usersRepository.AddToRole(user.Id, AdminRoleName);
+                    if(!addToRoleResult.Succeeded)
+                    {
+                        AddErrors(new IdentityResult("User could not be added to Admin role"));
+                        return View(model);
+                    }
+
                     await SignInAsync(user, isPersistent: false);
 
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
@@ -107,7 +146,7 @@ namespace IM.Identity.Web.Controllers
                 }
                 else
                 {
-                    AddErrors(result);
+                    AddErrors(userResult);
                 }
             }
 
