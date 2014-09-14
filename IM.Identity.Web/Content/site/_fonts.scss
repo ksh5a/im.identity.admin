@@ -1,0 +1,24 @@
+﻿@font-face {
+    font-family: 'Oxygen';
+    src: url('../../fonts/Oxygen-Regular.ttf'), url('../../fonts/Oxygen-Regular.eot#iefix') format('embedded-opentype');
+}
+
+@font-face {
+    font-family: 'Oxygen-Bold';
+    src: url('../../fonts/Oxygen-Bold.ttf'), url('../../fonts/Oxygen-Bold.eot#iefix') format('embedded-opentype');
+}
+
+@font-face {
+    font-family: 'Oxygen-Light';
+    src: url('../../fonts/Oxygen-Light.ttf'), url('../../fonts/Oxygen-Light.eot#iefix') format('embedded-opentype');
+}
+
+// Application fonts
+$applicationFont: Oxygen;
+$appfont-Title-Size: 24px;
+
+$appfont-Title: Oxygen-Light;
+$appfont-Text-Size: 18px;
+
+$appfont-Label-Size: 20px;
+$appfont-regual:14px;

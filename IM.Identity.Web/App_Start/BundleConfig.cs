@@ -26,7 +26,8 @@ namespace IM.Identity.Web
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/metro-bootstrap.css",
                       "~/Content/font-awesome.css",
-                      "~/Content/site.css"));
+                      "~/Content/site/site.css",
+                      "~/Content/site/layout.css"));
 
             // Set EnableOptimizations to false for debugging. For more information,
             // visit http://go.microsoft.com/fwlink/?LinkId=301862

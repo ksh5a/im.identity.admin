@@ -1,0 +1,9 @@
+{
+  "version": 3,
+  "file": "Layout.css",
+  "sources": [
+    "Layout.scss"
+  ],
+  "names": [],
+  "mappings": "AAAA,WAAW;EACP,SAAQ;;AAGZ;EACI,aAAa;EACb,cAAc;EACd,eAAe"
+}

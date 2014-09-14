@@ -1,0 +1,184 @@
+﻿/* 
+    Mixins taken from: http://zerosixthree.se/8-sass-mixins-you-must-have-in-your-toolbox 
+    AUTHOR: Sebastian Ekström
+*/
+
+//----------------------------------------------
+// Vertical align anything with just 3 lines of CSS
+// http://zerosixthree.se/vertical-align-anything-with-just-3-lines-of-css/
+//----------------------------------------------
+
+@mixin vertical-align {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/*
+    Usage:
+    .element p {
+      @include vertical-align;
+    }    
+*/
+
+//----------------------------------------------
+// Set a rem font size with pixel fallback
+// http://snook.ca/archives/html_and_css/font-size-with-rem
+//----------------------------------------------
+
+@function calculateRem($size) {
+  $remSize: $size / 16px;
+  @return $remSize * 1rem;
+}
+
+@mixin font-size($size) {
+  font-size: $size;
+  font-size: calculateRem($size);
+}
+
+/*
+    Usage:
+    p {
+      @include font-size(14px)
+    }
+
+    Output:
+    p {
+      font-size: 14px; // Will be overridden if browser supports rem
+      font-size: 0.8rem;
+    }
+*/
+
+//----------------------------------------------
+// Animations and keyframes
+//----------------------------------------------
+
+@mixin keyframes($animation-name) {
+  @-webkit-keyframes $animation-name {
+    @content;
+  }
+  @-moz-keyframes $animation-name {
+    @content;
+  }  
+  @-ms-keyframes $animation-name {
+    @content;
+  }
+  @-o-keyframes $animation-name {
+    @content;
+  }  
+  @keyframes $animation-name {
+    @content;
+  }
+}
+
+@mixin animation($str) {
+  -webkit-animation: #{$str};
+  -moz-animation: #{$str};
+  -ms-animation: #{$str};
+  -o-animation: #{$str};
+  animation: #{$str};      
+}
+
+/*
+    Usage:
+    @include keyframes(slide-down) {
+      0% { opacity: 1; }
+      90% { opacity: 0; }
+    }
+
+    .element {
+      width: 100px;
+      height: 100px;
+      background: black;
+      @include animation('slide-down 5s 3');
+    }
+*/
+
+//----------------------------------------------
+// Transitions
+//----------------------------------------------
+
+@mixin transition($args...) {
+  -webkit-transition: $args;
+  -moz-transition: $args;
+  -ms-transition: $args;
+  -o-transition: $args;
+  transition: $args;
+}
+
+/*
+    Usage:
+    a {
+      color: gray;
+      @include transition(color .3s ease);
+      &:hover {
+        color: black;
+      }
+    }
+*/
+
+//----------------------------------------------
+// Cross browser opacity
+//----------------------------------------------
+@mixin opacity($opacity) {
+  opacity: $opacity;
+  $opacity-ie: $opacity * 100;
+  filter: alpha(opacity=$opacity-ie); //IE8
+}
+
+/*
+    Usage:
+    .faded-text {
+      @include opacity(0.8);
+    }    
+*/
+
+//----------------------------------------------
+// Clearfix
+//----------------------------------------------
+
+%clearfix {
+  *zoom: 1;
+  &:before, &:after {
+    content: " ";
+    display: table;
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+/*
+    Usage:
+    .container-with-floated-children {
+      @extend %clearfix;
+    }
+*/
+
+//----------------------------------------------
+// Visually hide an element
+//----------------------------------------------
+
+%visuallyhidden {
+  margin: -1px;
+  padding: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip: rect(0, 0, 0, 0);
+  position: absolute;
+}
+
+/*
+    Usage:
+    <button class="mobile-navigation-trigger">
+      <b class="visually-hidden">Open the navigation</b>
+      <img src="img/mobile-navigation-icon.svg">
+    </button>
+
+    .visually-hidden {
+      @extend %visuallyhidden;
+    }
+*/
+

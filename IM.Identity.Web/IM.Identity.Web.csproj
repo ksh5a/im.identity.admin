@@ -211,11 +211,22 @@
     <Content Include="Content\gridmvc.datepicker.min.css" />
     <Content Include="Content\metro-bootstrap.css" />
     <Content Include="Content\metro-bootstrap.min.css" />
+    <Content Include="Content\site\Layout.css">
+      <DependentUpon>Layout.scss</DependentUpon>
+    </Content>
+    <Content Include="Content\site\Layout.min.css">
+      <DependentUpon>Layout.css</DependentUpon>
+    </Content>
+    <Content Include="Content\site\Site.css">
+      <DependentUpon>Site.scss</DependentUpon>
+    </Content>
+    <Content Include="Content\site\Site.min.css">
+      <DependentUpon>Site.css</DependentUpon>
+    </Content>
     <Content Include="favicon.ico" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
-    <Content Include="Content\Site.css" />
     <Content Include="Scripts\bootstrap-datepicker.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -224,6 +235,23 @@
     <Content Include="fonts\fontawesome-webfont.ttf" />
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="fonts\Oxygen-Bold.eot" />
+    <Content Include="fonts\Oxygen-Bold.ttf" />
+    <Content Include="fonts\Oxygen-Light.eot" />
+    <Content Include="fonts\Oxygen-Light.ttf" />
+    <Content Include="fonts\Oxygen-Regular.eot" />
+    <Content Include="fonts\Oxygen-Regular.ttf" />
+    <Content Include="Content\site\_mixins.scss" />
+    <Content Include="Content\site\_fonts.scss" />
+    <Content Include="Content\site\_colors.scss" />
+    <Content Include="Content\site\Site.scss" />
+    <Content Include="Content\site\Site.css.map">
+      <DependentUpon>Site.css</DependentUpon>
+    </Content>
+    <Content Include="Content\site\Layout.scss" />
+    <Content Include="Content\site\Layout.css.map">
+      <DependentUpon>Layout.css</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\gridmvc.js" />
     <Content Include="Scripts\gridmvc.lang.ru.js" />

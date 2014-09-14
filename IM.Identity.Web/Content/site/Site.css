@@ -1,0 +1,123 @@
+﻿@font-face {
+  font-family: 'Oxygen';
+  src: url('../../fonts/Oxygen-Regular.ttf'), url('../../fonts/Oxygen-Regular.eot#iefix') format('embedded-opentype'); }
+
+@font-face {
+  font-family: 'Oxygen-Bold';
+  src: url('../../fonts/Oxygen-Bold.ttf'), url('../../fonts/Oxygen-Bold.eot#iefix') format('embedded-opentype'); }
+
+@font-face {
+  font-family: 'Oxygen-Light';
+  src: url('../../fonts/Oxygen-Light.ttf'), url('../../fonts/Oxygen-Light.eot#iefix') format('embedded-opentype'); }
+
+/* 
+    Mixins taken from: http://zerosixthree.se/8-sass-mixins-you-must-have-in-your-toolbox 
+    AUTHOR: Sebastian Ekström
+*/
+/*
+    Usage:
+    .element p {
+      @include vertical-align;
+    }    
+*/
+/*
+    Usage:
+    p {
+      @include font-size(14px)
+    }
+
+    Output:
+    p {
+      font-size: 14px; // Will be overridden if browser supports rem
+      font-size: 0.8rem;
+    }
+*/
+/*
+    Usage:
+    @include keyframes(slide-down) {
+      0% { opacity: 1; }
+      90% { opacity: 0; }
+    }
+
+    .element {
+      width: 100px;
+      height: 100px;
+      background: black;
+      @include animation('slide-down 5s 3');
+    }
+*/
+/*
+    Usage:
+    a {
+      color: gray;
+      @include transition(color .3s ease);
+      &:hover {
+        color: black;
+      }
+    }
+*/
+/*
+    Usage:
+    .faded-text {
+      @include opacity(0.8);
+    }    
+*/
+/*
+    Usage:
+    .container-with-floated-children {
+      @extend %clearfix;
+    }
+*/
+/*
+    Usage:
+    <button class="mobile-navigation-trigger">
+      <b class="visually-hidden">Open the navigation</b>
+      <img src="img/mobile-navigation-icon.svg">
+    </button>
+
+    .visually-hidden {
+      @extend %visuallyhidden;
+    }
+*/
+body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+  background-color: #333; }
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-top: 10px;
+  background-color: #fff; }
+
+/* Set width on the form input elements since they're 100% wide by default */
+input, select, textarea {
+  max-width: 280px; }
+
+.tableColumnCheckbox {
+  width: 40px; }
+
+.formHeader, .formLeftHeader, .formRightHeader {
+  height: 80px;
+  padding-left: 20px;
+  margin: 0; }
+
+.formInnerHeader {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  float: left; }
+
+.formLeftHeader {
+  background-color: steelblue; }
+
+.formRightHeader {
+  background-color: grey; }
+
+.pageHeaderCaption {
+  color: white;
+  font-family: Oxygen;
+  font-size: 24px; }
+
+/*# sourceMappingURL=Site.css.map */
