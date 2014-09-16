@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Net;
 using System.Web.Mvc;
@@ -6,6 +7,8 @@ using IM.Identity.BI.Models;
 using IM.Identity.BI.Repository.Interface;
 using IM.Identity.BI.Repository.NInject;
 using IM.Identity.Web.Models;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Ninject;
 
 namespace IM.Identity.Web.Controllers
@@ -13,11 +16,13 @@ namespace IM.Identity.Web.Controllers
     public class UsersController : Controller
     {
         private readonly IUserIdentityRepository<ApplicationUser> _usersRepository;
+        private readonly IIdentityRepository<IdentityRole> _rolesRepository;
 
         public UsersController()
         {
             var kernel = new StandardKernel(new RepositoryModule());
             _usersRepository = kernel.Get<IUserIdentityRepository<ApplicationUser>>();
+            _rolesRepository = kernel.Get<IIdentityRepository<IdentityRole>>();
         }
 
         // GET: Users
@@ -43,13 +48,33 @@ namespace IM.Identity.Web.Controllers
                 return HttpNotFound();
             }
 
-            return View(user);
+            var userViewModel = new UserViewModel
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                TwoFactorEnabled = user.TwoFactorEnabled,
+                LockoutEnabled = user.LockoutEnabled,
+                LockoutEndDateUtc = user.LockoutEndDateUtc,
+                EmailConfirmed = user.EmailConfirmed,
+                PhoneNumberConfirmed = user.PhoneNumberConfirmed,
+                AccessFailedCount = user.AccessFailedCount,
+                RoleViewModels = GetRoleViewModels(user)
+            };
+
+            return View(userViewModel);
         }
 
         // GET: Users/Create
         public ActionResult Create()
         {
-            return View();
+            var userViewModel = new UserViewModel
+            {
+                RoleViewModels = GetRoleViewModels()
+            };
+
+            return View(userViewModel);
         }
 
         // POST: Users/Create
@@ -70,8 +95,17 @@ namespace IM.Identity.Web.Controllers
                     LockoutEnabled = userViewModel.LockoutEnabled
                 };
 
-                var result = await _usersRepository.Insert(user, userViewModel.Password);
-                if (!result.Succeeded)
+                var result = await _usersRepository.Insert(user);
+                if (result.Succeeded)
+                {
+                    result = await _usersRepository.AddToRoles(user.Id, userViewModel.RoleViewModels.Where(x => x.HasRole).Select(x => x.RoleName));
+                    if (!result.Succeeded)
+                    {
+                        AddErrors(new IdentityResult("User could not be added to roles"));
+                        return View(userViewModel);
+                    }
+                }
+                else 
                 {
                     ModelState.AddModelError("", result.Errors.First());
                     return View();
@@ -97,7 +131,18 @@ namespace IM.Identity.Web.Controllers
                 return HttpNotFound();
             }
 
-            return View(user);
+            var userViewModel = new UserViewModel
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                TwoFactorEnabled = user.TwoFactorEnabled,
+                LockoutEnabled = user.LockoutEnabled,
+                RoleViewModels = GetRoleViewModels(user)
+            };
+
+            return View(userViewModel);
         }
 
         // POST: Users/Edit/5
@@ -105,25 +150,37 @@ namespace IM.Identity.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,UserName,Email,PhoneNumber,TwoFactorEnabled,LockoutEnabled")] ApplicationUser applicationUser)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,UserName,Email,PhoneNumber,TwoFactorEnabled,LockoutEnabled,RoleViewModels")] UserViewModel userViewModel)
         {
             if (ModelState.IsValid)
             {
-                var user = await _usersRepository.Get(applicationUser.Id);
-                user.UserName = applicationUser.UserName;
-                user.Email = applicationUser.Email;
-                user.PhoneNumber = applicationUser.PhoneNumber;
-                user.TwoFactorEnabled = applicationUser.TwoFactorEnabled;
-                user.LockoutEnabled = applicationUser.LockoutEnabled;
+                var user = await _usersRepository.Get(userViewModel.Id);
+                user.UserName = userViewModel.UserName;
+                user.Email = userViewModel.Email;
+                user.PhoneNumber = userViewModel.PhoneNumber;
+                user.TwoFactorEnabled = userViewModel.TwoFactorEnabled;
+                user.LockoutEnabled = userViewModel.LockoutEnabled;
 
                 var result = await _usersRepository.Update(user);
                 if (result.Succeeded)
                 {
+                    result = await _usersRepository.AddToRoles(user.Id, userViewModel.RoleViewModels.Where(x => x.HasRole).Select(x => x.RoleName));
+                    if (!result.Succeeded)
+                    {
+                        AddErrors(new IdentityResult("User could not be added to roles"));
+                        return View(userViewModel);
+                    }
+
                     return RedirectToAction("Index");
+                }
+                else
+                {
+                    ModelState.AddModelError("", result.Errors.First());
+                    return View(userViewModel);
                 }
             }
 
-            return View(applicationUser);
+            return View(userViewModel);
         }
 
         // GET: Users/Delete/5
@@ -153,11 +210,55 @@ namespace IM.Identity.Web.Controllers
             return RedirectToAction("Index");
         }
 
+        private IList<IdentityRoleViewModel> GetRoleViewModels(ApplicationUser user = null)
+        {
+            IList<IdentityRoleViewModel> roleViewModels;
+
+            if (user == null)
+            {
+                var allRoles = _rolesRepository.Get();
+                roleViewModels = (
+                    from IdentityRole identityRole in allRoles
+                    select new IdentityRoleViewModel
+                    {
+                        RoleId = identityRole.Id,
+                        RoleName = identityRole.Name,
+                    }).ToList();
+            }
+            else
+            {
+                var allRoles = _rolesRepository.Get();
+                var userRoleIds = user.Roles.Select(x => x.RoleId);
+                roleViewModels = (
+                    from IdentityRole identityRole in allRoles
+                    select new IdentityRoleViewModel
+                    {
+                        RoleId = identityRole.Id,
+                        RoleName = identityRole.Name,
+                        HasRole = userRoleIds.Contains(identityRole.Id)
+                    }).ToList();
+            }
+
+            return roleViewModels;
+        }
+
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error);
+            }
+        }
+
+        #region IDisposable
+
         protected override void Dispose(bool disposing)
         {
             _usersRepository.Dispose();
 
             base.Dispose(disposing);
         }
+
+        #endregion
     }
 }

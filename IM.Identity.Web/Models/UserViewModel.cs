@@ -1,9 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace IM.Identity.Web.Models
 {
     public class UserViewModel
     {
+        public string Id { get; set; }
+
         [Required]
         [Display(Name = "User Name")]
         public string UserName { get; set; }
@@ -15,24 +20,27 @@ namespace IM.Identity.Web.Models
 
         [Required]
         [Phone]
-        [Display(Name = "PhoneNumber")]
+        [Display(Name = "Phone")]
         public string PhoneNumber { get; set; }
 
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
-        [DataType(DataType.Password)]
-        [Display(Name = "Password")]
-        public string Password { get; set; }
-
-        [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-        public string ConfirmPassword { get; set; }
-
-        [Display(Name = "TwoFactorEnabled")]
+        [Display(Name = "Two Factor")]
         public bool TwoFactorEnabled { get; set; }
 
-        [Display(Name = "LockoutEnabled")]
+        [Display(Name = "Lockout")]
         public bool LockoutEnabled { get; set; }
+
+        [Display(Name = "Email Confirmed")]
+        public bool EmailConfirmed { get; set; }
+
+        [Display(Name = "Phone Number Confirmed")]
+        public bool PhoneNumberConfirmed { get; set; }
+
+        [Display(Name = "Lockout End Date")]
+        public DateTime? LockoutEndDateUtc { get; set; }
+
+        [Display(Name = "Access Failed Count")]
+        public int AccessFailedCount { get; set; }
+
+        public IList<IdentityRoleViewModel> RoleViewModels { get; set; }
     }
 }

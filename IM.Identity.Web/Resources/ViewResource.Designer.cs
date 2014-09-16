@@ -140,5 +140,14 @@ namespace IM.Identity.Web.Resources {
                 return ResourceManager.GetString("UserName", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Identity Manager.
+        /// </summary>
+        public static string WebTitle {
+            get {
+                return ResourceManager.GetString("WebTitle", resourceCulture);
+            }
+        }
     }
 }

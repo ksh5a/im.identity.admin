@@ -1,91 +1,118 @@
-﻿@model IM.Identity.BI.Models.ApplicationUser
+﻿@model IM.Identity.Web.Models.UserViewModel
 
 @{
     ViewBag.Title = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Details</h2>
+<div class="row">
+    
+    <div class="col-md-8">
 
-<div>
-    <h4>ApplicationUser</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        
-        <dt>
-            @Html.DisplayNameFor(model => model.UserName)
-        </dt>
+        <div class="row formLeftHeader">
+            <div class="formInnerHeader">
+                <h2 class="pageHeaderCaption">User Details</h2>
+            </div>
+        </div>
 
-        <dd>
-            @Html.DisplayFor(model => model.UserName)
-        </dd>
+        <div class="layoutForm">
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
+            <dl class="dl-horizontal">
 
-        <dd>
-            @Html.DisplayFor(model => model.Email)
-        </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.UserName)
+                </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.EmailConfirmed)
-        </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.UserName)
+                </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.EmailConfirmed)
-        </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.Email)
+                </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.PhoneNumber)
-        </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Email)
+                </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.PhoneNumber)
-        </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.EmailConfirmed)
+                </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.PhoneNumberConfirmed)
-        </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.EmailConfirmed)
+                </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.PhoneNumberConfirmed)
-        </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.PhoneNumber)
+                </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.TwoFactorEnabled)
-        </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.PhoneNumber)
+                </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.TwoFactorEnabled)
-        </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.PhoneNumberConfirmed)
+                </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.LockoutEndDateUtc)
-        </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.PhoneNumberConfirmed)
+                </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.LockoutEndDateUtc)
-        </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.TwoFactorEnabled)
+                </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.LockoutEnabled)
-        </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.TwoFactorEnabled)
+                </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.LockoutEnabled)
-        </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.LockoutEndDateUtc)
+                </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.AccessFailedCount)
-        </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.LockoutEndDateUtc)
+                </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.AccessFailedCount)
-        </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.LockoutEnabled)
+                </dt>
 
-    </dl>
+                <dd>
+                    @Html.DisplayFor(model => model.LockoutEnabled)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.AccessFailedCount)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.AccessFailedCount)
+                </dd>
+
+            </dl>
+
+        </div>
+
+    </div>
+    
+    <div class="col-md-4">
+
+        <div class="row formRightHeader">
+            <div class="formInnerHeader">
+                <h2 class="pageHeaderCaption">Roles</h2>
+            </div>
+        </div>
+
+        <div class="form-horizontal layoutForm">
+            @Html.Partial("_Roles", Model);
+        </div>
+
+    </div>
+
 </div>
+
 <p>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     @Html.ActionLink("Back to List", "Index")

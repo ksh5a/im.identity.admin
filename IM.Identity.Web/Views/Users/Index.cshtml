@@ -6,78 +6,92 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Index</h2>
+<div class="row">
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayName(ViewResource.UserName)
-        </th>
-        <th>
-            @Html.DisplayName(ViewResource.Email)
-        </th>
-        <th class="tableColumnCheckbox">
-            @Html.DisplayName(ViewResource.EmailConfirmed)
-        </th>
-        <th>
-            @Html.DisplayName(ViewResource.Phone)
-        </th>
-        <th class="tableColumnCheckbox">
-            @Html.DisplayName(ViewResource.PhoneNumberConfirmed)
-        </th>
-        <th class="tableColumnCheckbox">
-            @Html.DisplayName(ViewResource.TwoFactorEnabled)
-        </th>
-        <th>
-            @Html.DisplayName(ViewResource.LockoutEndDateUtc)
-        </th>
-        <th>
-            @Html.DisplayName(ViewResource.LockoutEnabled)
-        </th>
-        <th>
-            @Html.DisplayName(ViewResource.AccessFailedCount)
-        </th>
-        <th></th>
-    </tr>
+    <div class="formLeftHeader">
+        <div class="formInnerHeader">
+            <h2 class="pageHeaderCaption">Users</h2>
+        </div>
+    </div>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.UserName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Email)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.EmailConfirmed)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.PhoneNumber)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.PhoneNumberConfirmed)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.TwoFactorEnabled)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LockoutEndDateUtc)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LockoutEnabled)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.AccessFailedCount)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
-        </td>
-    </tr>
-}
+    <div class="layoutForm">
 
-</table>
+        <p>
+            @Html.ActionLink("Create New", "Create")
+        </p>
+
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.DisplayName(ViewResource.UserName)
+                </th>
+                <th>
+                    @Html.DisplayName(ViewResource.Email)
+                </th>
+                <th class="tableColumnCheckbox">
+                    @Html.DisplayName(ViewResource.EmailConfirmed)
+                </th>
+                <th>
+                    @Html.DisplayName(ViewResource.Phone)
+                </th>
+                <th class="tableColumnCheckbox">
+                    @Html.DisplayName(ViewResource.PhoneNumberConfirmed)
+                </th>
+                <th class="tableColumnCheckbox">
+                    @Html.DisplayName(ViewResource.TwoFactorEnabled)
+                </th>
+                <th>
+                    @Html.DisplayName(ViewResource.LockoutEndDateUtc)
+                </th>
+                <th>
+                    @Html.DisplayName(ViewResource.LockoutEnabled)
+                </th>
+                <th>
+                    @Html.DisplayName(ViewResource.AccessFailedCount)
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmailConfirmed)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PhoneNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PhoneNumberConfirmed)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TwoFactorEnabled)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LockoutEndDateUtc)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LockoutEnabled)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AccessFailedCount)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                </td>
+            </tr>
+            }
+
+        </table>
+
+    </div>
+
+</div>

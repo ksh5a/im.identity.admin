@@ -144,4 +144,7 @@
   <data name="UserName" xml:space="preserve">
     <value>Name</value>
   </data>
+  <data name="WebTitle" xml:space="preserve">
+    <value>Identity Manager</value>
+  </data>
 </root>

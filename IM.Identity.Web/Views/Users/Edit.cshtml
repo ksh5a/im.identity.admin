@@ -1,4 +1,5 @@
-﻿@model IM.Identity.BI.Models.ApplicationUser
+﻿@using System.Data
+@model IM.Identity.Web.Models.UserViewModel
 
 @{
     ViewBag.Title = "Edit";
@@ -11,13 +12,6 @@
 
     <div class="row">
 
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.Id)
-
-    </div>
-
-    <div class="row">
-
         <div class="col-md-8">
             
             <div class="row formLeftHeader">
@@ -27,6 +21,13 @@
             </div>
 
             <div class="form-horizontal layoutForm">
+                
+                <div class="form-group">
+
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    @Html.HiddenFor(model => model.Id)
+
+                </div>
 
                 <div class="form-group">
                     @Html.LabelFor(model => model.UserName, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -35,7 +36,7 @@
                         @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
                     </div>
                 </div>
-
+                
                 <div class="form-group">
                     @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
@@ -85,18 +86,7 @@
             </div>
 
             <div class="form-horizontal layoutForm">
-
-                <div class="form-group">
-                    @Html.LabelFor(model => model.LockoutEnabled, htmlAttributes: new { @class = "control-label col-md-5" })
-
-                    <div class="col-md-7">
-                        <div class="checkbox">
-                            @Html.EditorFor(model => model.LockoutEnabled)
-                            @Html.ValidationMessageFor(model => model.LockoutEnabled, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                </div>
+                @Html.Partial("_Roles", Model);
             </div>
 
         </div>
