@@ -138,9 +138,6 @@
   <data name="PhoneNumberConfirmed" xml:space="preserve">
     <value>Phone Confirmed</value>
   </data>
-  <data name="TwoFactorEnabled" xml:space="preserve">
-    <value>Two Factor</value>
-  </data>
   <data name="UserName" xml:space="preserve">
     <value>Name</value>
   </data>

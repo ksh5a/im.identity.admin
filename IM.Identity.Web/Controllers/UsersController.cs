@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Net;
+using System.Web;
 using System.Web.Mvc;
 using IM.Identity.BI.Models;
 using IM.Identity.BI.Repository.Interface;
@@ -9,6 +10,7 @@ using IM.Identity.BI.Repository.NInject;
 using IM.Identity.Web.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity.Owin;
 using Ninject;
 
 namespace IM.Identity.Web.Controllers
@@ -17,6 +19,13 @@ namespace IM.Identity.Web.Controllers
     {
         private readonly IUserIdentityRepository<ApplicationUser> _usersRepository;
         private readonly IIdentityRepository<IdentityRole> _rolesRepository;
+        private ApplicationUserManager _userManager;
+
+        public ApplicationUserManager UserManager
+        {
+            get { return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>(); }
+            private set { _userManager = value; }
+        }
 
         public UsersController()
         {
@@ -54,7 +63,6 @@ namespace IM.Identity.Web.Controllers
                 UserName = user.UserName,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
-                TwoFactorEnabled = user.TwoFactorEnabled,
                 LockoutEnabled = user.LockoutEnabled,
                 LockoutEndDateUtc = user.LockoutEndDateUtc,
                 EmailConfirmed = user.EmailConfirmed,
@@ -91,7 +99,6 @@ namespace IM.Identity.Web.Controllers
                     UserName = userViewModel.UserName,
                     Email = userViewModel.Email,
                     PhoneNumber = userViewModel.PhoneNumber,
-                    TwoFactorEnabled = userViewModel.TwoFactorEnabled,
                     LockoutEnabled = userViewModel.LockoutEnabled
                 };
 
@@ -108,8 +115,10 @@ namespace IM.Identity.Web.Controllers
                 else 
                 {
                     ModelState.AddModelError("", result.Errors.First());
-                    return View();
+                    return View(userViewModel);
                 }
+
+                var callbackUrl = await SendEmailConfirmationTokenAsync(user.Id, "Confirm your account");
 
                 return RedirectToAction("Index");
             }
@@ -137,7 +146,6 @@ namespace IM.Identity.Web.Controllers
                 UserName = user.UserName,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
-                TwoFactorEnabled = user.TwoFactorEnabled,
                 LockoutEnabled = user.LockoutEnabled,
                 RoleViewModels = GetRoleViewModels(user)
             };
@@ -150,7 +158,7 @@ namespace IM.Identity.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,UserName,Email,PhoneNumber,TwoFactorEnabled,LockoutEnabled,RoleViewModels")] UserViewModel userViewModel)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,UserName,Email,PhoneNumber,LockoutEnabled,RoleViewModels")] UserViewModel userViewModel)
         {
             if (ModelState.IsValid)
             {
@@ -158,7 +166,6 @@ namespace IM.Identity.Web.Controllers
                 user.UserName = userViewModel.UserName;
                 user.Email = userViewModel.Email;
                 user.PhoneNumber = userViewModel.PhoneNumber;
-                user.TwoFactorEnabled = userViewModel.TwoFactorEnabled;
                 user.LockoutEnabled = userViewModel.LockoutEnabled;
 
                 var result = await _usersRepository.Update(user);
@@ -242,6 +249,8 @@ namespace IM.Identity.Web.Controllers
             return roleViewModels;
         }
 
+        #region Helpers
+
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
@@ -249,6 +258,21 @@ namespace IM.Identity.Web.Controllers
                 ModelState.AddModelError("", error);
             }
         }
+
+        public async Task<string> SendEmailConfirmationTokenAsync(string userId, string subject)
+        {
+            var code = await UserManager.GenerateEmailConfirmationTokenAsync(userId);
+
+            var callbackUrl = Url.Action("ConfirmEmail", "Account",
+               new { userId = userId, code = code }, protocol: Request.Url.Scheme);
+
+            await UserManager.SendEmailAsync(userId, subject,
+               "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+
+            return callbackUrl;
+        }
+
+        #endregion
 
         #region IDisposable
 

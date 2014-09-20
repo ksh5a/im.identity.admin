@@ -124,15 +124,6 @@ namespace IM.Identity.Web.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Two Factor.
-        /// </summary>
-        public static string TwoFactorEnabled {
-            get {
-                return ResourceManager.GetString("TwoFactorEnabled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
         public static string UserName {

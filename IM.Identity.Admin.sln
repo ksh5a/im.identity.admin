@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IM.Identity.Web.Tests", "IM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IM.Identity.BI", "IM.Identity.BI\IM.Identity.BI.csproj", "{72511E3A-101D-4A77-9E39-172E29ABB431}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IM.Identity.Email", "IM.Identity.Email\IM.Identity.Email.csproj", "{4CB2C4EC-1B04-4994-92DF-71FAA8A33B00}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{72511E3A-101D-4A77-9E39-172E29ABB431}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72511E3A-101D-4A77-9E39-172E29ABB431}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72511E3A-101D-4A77-9E39-172E29ABB431}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CB2C4EC-1B04-4994-92DF-71FAA8A33B00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CB2C4EC-1B04-4994-92DF-71FAA8A33B00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CB2C4EC-1B04-4994-92DF-71FAA8A33B00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CB2C4EC-1B04-4994-92DF-71FAA8A33B00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

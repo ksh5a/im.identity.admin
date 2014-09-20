@@ -1,0 +1,31 @@
+﻿<appSettings>
+
+  <!-- General -->
+  <add key="MailAdmin" value="administrator@yahoo.com" />
+
+  <!-- Email & Sms current services -->
+  <!-- Supported email services: Smtp, SendGrid -->
+  <!-- Supported sms services: Twilio -->
+  <add key="EmailService" value="Smtp" />
+  <add key="SmsService" value="Twilio" />
+
+  
+  <!-- SendGrid-->
+  <add key="MailAccount" value="account" />
+  <add key="MailPassword" value="password" />
+
+  <!-- SMTP-->
+  <add key="SmtpServer" value="smtp.gmail.com" />
+  <add key="SmtpUserName" value="rzvdaniel@gmail.com" />
+  <add key="SmtpPassword" value="$$$Arizonadream111" />
+  <add key="SmtpPort" value="587" />
+
+  <!-- Twilio-->
+      <add key="TwilioSid" value="sid" />
+      <add key="TwilioToken" value="token" />
+      <add key="TwilioFromPhone" value="+206-555-1234" />
+
+<!--      <add key="GoogClientID" value=".apps.googleusercontent.com" />-->
+<!--      <add key="GoogClientSecret" value="1234" />-->
+  
+</appSettings>

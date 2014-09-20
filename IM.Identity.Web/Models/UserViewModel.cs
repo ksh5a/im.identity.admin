@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace IM.Identity.Web.Models
 {
@@ -22,9 +21,6 @@ namespace IM.Identity.Web.Models
         [Phone]
         [Display(Name = "Phone")]
         public string PhoneNumber { get; set; }
-
-        [Display(Name = "Two Factor")]
-        public bool TwoFactorEnabled { get; set; }
 
         [Display(Name = "Lockout")]
         public bool LockoutEnabled { get; set; }
