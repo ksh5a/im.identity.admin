@@ -120,11 +120,64 @@
   <data name="AccessFailedCount" xml:space="preserve">
     <value>Access Fails</value>
   </data>
+  <data name="ConfirmAdminEmailText" xml:space="preserve">
+    <value>Thank you for confirming your account. Please login to the website using the link below.</value>
+  </data>
+  <data name="ConfirmEmailError" xml:space="preserve">
+    <value>An error has occured when confirming your email</value>
+  </data>
+  <data name="SetupPasswordUrl" xml:space="preserve">
+    <value>Create password</value>
+  </data>
+  <data name="ConfirmEmailText" xml:space="preserve">
+    <value>Thank you for confirming your account. Please create a password clicking the link below.</value>
+  </data>
   <data name="Email" xml:space="preserve">
     <value>Email</value>
   </data>
+  <data name="EmailConfirmationTemplate" xml:space="preserve">
+    <value>&lt;!DOCTYPE html&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+&lt;head&gt;
+    &lt;title&gt;Email Confirmation&lt;/title&gt;
+    &lt;style&gt;
+        .button {
+            text-decoration: none;
+            background-color: steelblue;
+            color: white;
+            padding: 4px 10px 4px 10px;
+        }
+
+        .steelBlue {
+            color: steelblue;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h3&gt;
+        Thank you for registering with &lt;span class="steelBlue"&gt;Identity Manager&lt;/span&gt;.
+    &lt;/h3&gt;
+    Please confirm your email address by clicking on following button:
+    &lt;br /&gt;
+    &lt;br /&gt;
+    &lt;a href=###EmailConfirmUrl### class="button"&gt;Confirm my email&lt;/a&gt;
+    &lt;br /&gt;
+    &lt;br /&gt;
+    If you face problems with the button above, please copy and paste the following line in your web browser:
+    &lt;br /&gt;
+    &lt;br /&gt;
+    ###EmailConfirmUrl###
+    &lt;br /&gt;
+    &lt;br /&gt;
+    If you did not request any registration, ignore this message and nothing will happen.
+&lt;/body&gt;
+&lt;/html&gt;</value>
+  </data>
   <data name="EmailConfirmed" xml:space="preserve">
     <value>Email Confirmed</value>
+  </data>
+  <data name="ErrorAccessDenied" xml:space="preserve">
+    <value>You do not have enough rights to access this page.</value>
   </data>
   <data name="LockoutEnabled" xml:space="preserve">
     <value>Lockout</value>
@@ -132,16 +185,60 @@
   <data name="LockoutEndDateUtc" xml:space="preserve">
     <value>Lockout Date</value>
   </data>
+  <data name="LoginFormLink" xml:space="preserve">
+    <value>Login</value>
+  </data>
   <data name="Phone" xml:space="preserve">
     <value>Phone</value>
   </data>
   <data name="PhoneNumberConfirmed" xml:space="preserve">
     <value>Phone Confirmed</value>
   </data>
+  <data name="RegisterConfirmationMessage" xml:space="preserve">
+    <value>Thank you for registering. A request confirmation was send to your mail account. Please follow the provided link to confirm your registration.</value>
+  </data>
   <data name="UserName" xml:space="preserve">
     <value>Name</value>
   </data>
   <data name="WebTitle" xml:space="preserve">
     <value>Identity Manager</value>
+  </data>
+  <data name="PasswordResetTemplate" xml:space="preserve">
+    <value>&lt;!DOCTYPE html&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+&lt;head&gt;
+    &lt;title&gt;Password Reset&lt;/title&gt;
+    &lt;style&gt;
+        .button {
+            text-decoration: none;
+            background-color: steelblue;
+            color: white;
+            padding: 4px 10px 4px 10px;
+        }
+
+        .steelBlue {
+            color: steelblue;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h3&gt;
+        Hello,
+    &lt;/h3&gt;
+    Please reset your password by clicking on following button:
+    &lt;br /&gt;
+    &lt;br /&gt;
+    &lt;a href=###PasswordResetUrl### class="button"&gt;Reset Password&lt;/a&gt;
+    &lt;br /&gt;
+    &lt;br /&gt;
+    If you face problems with the button above, please copy and paste the following line in your web browser:
+    &lt;br /&gt;
+    &lt;br /&gt;
+    ###PasswordResetUrl###
+    &lt;br /&gt;
+    &lt;br /&gt;
+    If you did not request any password reset, please contact the entity who sent this email .
+&lt;/body&gt;
+&lt;/html&gt;</value>
   </data>
 </root>

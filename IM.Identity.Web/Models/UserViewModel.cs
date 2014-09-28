@@ -8,7 +8,6 @@ namespace IM.Identity.Web.Models
     {
         public string Id { get; set; }
 
-        [Required]
         [Display(Name = "User Name")]
         public string UserName { get; set; }
 

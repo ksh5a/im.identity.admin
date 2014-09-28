@@ -16,18 +16,19 @@ namespace IM.Identity.Email.Services
     {
         private const int DefaultPort = 25;
         private const int MailMessageRetries = 5;
+        private static int MailMessageRetryTimeout { get { return (int)(new TimeSpan(0, 0, 0, 5)).TotalSeconds; } }
 
         private string SmtpServer { get; set; }
         private NetworkCredential SmtpLogin { get; set; }
-        private static int MailMessageRetryTimeout { get { return (int)(new TimeSpan(0, 0, 0, 5)).TotalSeconds; } }
+        public int Port { get; set; }
 
         public string From { get; set; }
         public string To { get; set; }
+        public string Subject { get; set; }
+        public bool IsHtml { get; set; }
 
         public IEnumerable<AlternateView> AlternateViews { get; set; }
         public Dictionary<string, Stream> Attachments { get; set; }
-        public bool IsHtml { get; set; }
-        public int Port { get; set; }
 
         public SmtpEmailService()
         {
@@ -37,6 +38,10 @@ namespace IM.Identity.Email.Services
                 ConfigurationManager.AppSettings["SmtpUserName"], 
                 ConfigurationManager.AppSettings["SmtpPassword"]
             );
+
+            bool isHtml;
+            bool.TryParse(ConfigurationManager.AppSettings["SmtpHtmlBody"], out isHtml);
+            IsHtml = isHtml;
 
             From = ConfigurationManager.AppSettings["MailAdmin"];
             Attachments = new Dictionary<string, Stream>();
@@ -70,19 +75,10 @@ namespace IM.Identity.Email.Services
                 {
                     smtpClient.Send(mailMessage);
                     mailSentSuccessfully = true;
-
-                    // TODO! Implement logging
-                    //var logMessage = string.Format("Mail sent to: {0}. Subject: {1}", string.Join(",", To.ToArray()), Subject);
-                    //Logger.Logger.WriteInfo(logMessage, "Mail");
                 }
                 catch (Exception ex)
                 {
                     mailSentSuccessfully = false;
-
-                    // TODO! Implement logging
-                    //var logMessage = string.Format("Sending mail to: {0} failed. Subject: {1}. {2}", string.Join(",", To.ToArray()), Subject, mailMessageRetries > 1 ? "Retrying..." : string.Empty);
-                    //Logger.Logger.WriteException(ex, logMessage, "Failed Mail");
-
                     Thread.Sleep(MailMessageRetryTimeout);
                 }
 
@@ -95,6 +91,7 @@ namespace IM.Identity.Email.Services
         private MailMessage ConstructEmail(IdentityMessage message)
         {
             var mailMessage = new MailMessage { Subject = message.Subject };
+            mailMessage.IsBodyHtml = IsHtml;
 
             if (AlternateViews.Any())
             {

@@ -6,6 +6,7 @@ using IM.Identity.BI.Models;
 using IM.Identity.BI.Repository.Interface;
 using IM.Identity.BI.Repository.NInject;
 using IM.Identity.Web.Code;
+using IM.Identity.Web.Resources;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -16,7 +17,7 @@ using Ninject;
 namespace IM.Identity.Web.Controllers
 {
     [Authorize]
-    public class AccountController : Controller
+    public class AccountController : BaseAccountController
     {
         #region Constants
 
@@ -25,12 +26,10 @@ namespace IM.Identity.Web.Controllers
         #endregion
 
         #region Members
-        
+
+        private ApplicationSignInManager _signInManager;
         private readonly IRoleIdentityRepository<IdentityRole> _rolesRepository;
         private readonly IUserIdentityRepository<ApplicationUser> _usersRepository;
-        
-        private ApplicationUserManager _userManager;
-        private ApplicationSignInManager _signInManager;
 
         #endregion
 
@@ -39,11 +38,6 @@ namespace IM.Identity.Web.Controllers
         private IAuthenticationManager AuthenticationManager
         {
             get { return HttpContext.GetOwinContext().Authentication; }
-        }
-        public ApplicationUserManager UserManager
-        {
-            get { return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>(); }
-            private set { _userManager = value; }
         }
 
         public ApplicationSignInManager SignInManager
@@ -84,7 +78,7 @@ namespace IM.Identity.Web.Controllers
                 {
                     if (!await UserManager.IsEmailConfirmedAsync(user.Id))
                     {
-                        var callbackUrl = await SendEmailConfirmationTokenAsync(user.Id, "Confirm your account-Resend");
+                        await SendEmailConfirmation(user.Id, "Confirm your account - Resend");
 
                         ViewBag.ErrorMessage = "You must have a confirmed email to log on. "
                                              + "The confirmation token has been resent to your email account.";
@@ -259,8 +253,9 @@ namespace IM.Identity.Web.Controllers
 
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
-                    var callbackUrl = await SendEmailConfirmationTokenAsync(user.Id, "Confirm your account");
+                    await SendAdminEmailConfirmation(user.Id, "Confirm your account");
 
+                    ViewBag.Message = ViewResource.RegisterConfirmationMessage;
                     return View("Info");
                 }
                 else
@@ -283,15 +278,48 @@ namespace IM.Identity.Web.Controllers
                 return View("Error");
             }
 
-            IdentityResult result = await UserManager.ConfirmEmailAsync(userId, code);
+            var result = await UserManager.ConfirmEmailAsync(userId, code);
             if (result.Succeeded)
             {
+                var passwordResetToken = await UserManager.GeneratePasswordResetTokenAsync(userId);
+                var callbackUrl = Url.Action("SetupPassword", "Account", new { userId = userId, code = passwordResetToken }, protocol: Request.Url.Scheme);
+                ViewBag.SetupPassword = callbackUrl;
+
                 return View("ConfirmEmail");
             }
             else
             {
-                AddErrors(result);
-                return View();
+                ViewBag.ErrorMessage = ViewResource.ConfirmEmailError;
+                return View("Error");
+            }
+        }
+
+        //
+        // GET: /Account/ConfirmAdminEmail
+        [AllowAnonymous]
+        public async Task<ActionResult> ConfirmAdminEmail(string userId, string code)
+        {
+            if (userId == null || code == null)
+            {
+                return View("Error");
+            }
+
+            var user = await _usersRepository.Get(userId);
+            if (!user.UserRoles.Select(x => x.Name).Contains(AdminRoleName))
+            {
+                ViewBag.ErrorMessage = ViewResource.ErrorAccessDenied;
+                return View("Error");
+            }
+
+            var result = await UserManager.ConfirmEmailAsync(userId, code);
+            if (result.Succeeded)
+            {
+                return View("ConfirmAdminEmail");
+            }
+            else
+            {
+                ViewBag.ErrorMessage = ViewResource.ConfirmEmailError;
+                return View("Error");
             }
         }
 
@@ -315,16 +343,19 @@ namespace IM.Identity.Web.Controllers
                 var user = await UserManager.FindByNameAsync(model.Email);
                 if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
                 {
-                    ModelState.AddModelError("", "The user either does not exist or is not confirmed.");
-                    return View();
+                    // Don't reveal that the user does not exist or is not confirmed
+                    return View("ForgotPasswordConfirmation");
                 }
 
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                 // Send an email with this link
-                // string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                // var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
-                // await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
-                // return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                var code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+
+                var emailManager = new EmailManager(UserManager);
+                await emailManager.SendPasswordResetEmail(user.Id, "Reset Password", callbackUrl);
+                                
+                return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 
             // If we got this far, something failed, redisplay form
@@ -388,6 +419,52 @@ namespace IM.Identity.Web.Controllers
         public ActionResult ResetPasswordConfirmation()
         {
             return View();
+        }
+
+        //
+        // GET: /Account/SetupPassword
+        [AllowAnonymous]
+        public ActionResult SetupPassword(string code)
+        {
+            if (code == null)
+            {
+                return View("Error");
+            }
+            return View();
+        }
+
+        //
+        // POST: /Account/SetupPassword
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> SetupPassword(ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await UserManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "No user found.");
+                    return View();
+                }
+
+                var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
+                if (result.Succeeded)
+                {
+                    await SignInAsync(user, isPersistent: false);
+
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    AddErrors(result);
+                    return View();
+                }
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
         }
 
         //
@@ -617,11 +694,18 @@ namespace IM.Identity.Web.Controllers
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && UserManager != null)
+            if (disposing)
             {
-                UserManager.Dispose();
-                UserManager = null;
+                if (SignInManager != null)
+                {
+                    SignInManager.Dispose();
+                    SignInManager = null;
+                }
+
+                _usersRepository.Dispose();
+                _rolesRepository.Dispose();
             }
+
             base.Dispose(disposing);
         }
 
@@ -654,17 +738,24 @@ namespace IM.Identity.Web.Controllers
             return false;
         }
 
-        public async Task<string> SendEmailConfirmationTokenAsync(string userId, string subject)
+        private async Task<string> SendEmailConfirmation(string userId, string subject, string action)
         {
+            var emailManager = new EmailManager(UserManager);
             var code = await UserManager.GenerateEmailConfirmationTokenAsync(userId);
-
-            var callbackUrl = Url.Action("ConfirmEmail", "Account",
+            var callbackUrl = Url.Action(action, "Account",
                new { userId = userId, code = code }, protocol: Request.Url.Scheme);
 
-            await UserManager.SendEmailAsync(userId, subject,
-               "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+            return await emailManager.SendConfirmationEmail(userId, subject, callbackUrl);
+        }
 
-            return callbackUrl;
+        private async Task<string> SendEmailConfirmation(string userId, string subject)
+        {
+            return await SendEmailConfirmation(userId, subject, "ConfirmEmail");
+        }
+
+        private async Task<string> SendAdminEmailConfirmation(string userId, string subject)
+        {
+            return await SendEmailConfirmation(userId, subject, "ConfirmAdminEmail");
         }
 
         public enum ManageMessageId

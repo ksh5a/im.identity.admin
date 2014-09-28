@@ -2,30 +2,22 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
 using IM.Identity.BI.Models;
 using IM.Identity.BI.Repository.Interface;
 using IM.Identity.BI.Repository.NInject;
+using IM.Identity.Web.Code;
 using IM.Identity.Web.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.AspNet.Identity.Owin;
 using Ninject;
 
 namespace IM.Identity.Web.Controllers
 {
-    public class UsersController : Controller
+    public class UsersController : BaseAccountController
     {
         private readonly IUserIdentityRepository<ApplicationUser> _usersRepository;
         private readonly IIdentityRepository<IdentityRole> _rolesRepository;
-        private ApplicationUserManager _userManager;
-
-        public ApplicationUserManager UserManager
-        {
-            get { return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>(); }
-            private set { _userManager = value; }
-        }
 
         public UsersController()
         {
@@ -96,7 +88,7 @@ namespace IM.Identity.Web.Controllers
             {
                 var user = new ApplicationUser
                 {
-                    UserName = userViewModel.UserName,
+                    UserName = userViewModel.Email,
                     Email = userViewModel.Email,
                     PhoneNumber = userViewModel.PhoneNumber,
                     LockoutEnabled = userViewModel.LockoutEnabled
@@ -118,7 +110,7 @@ namespace IM.Identity.Web.Controllers
                     return View(userViewModel);
                 }
 
-                var callbackUrl = await SendEmailConfirmationTokenAsync(user.Id, "Confirm your account");
+                await SendEmailConfirmation(user.Id, "Confirm your account");
 
                 return RedirectToAction("Index");
             }
@@ -163,7 +155,7 @@ namespace IM.Identity.Web.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _usersRepository.Get(userViewModel.Id);
-                user.UserName = userViewModel.UserName;
+                user.UserName = userViewModel.Email;
                 user.Email = userViewModel.Email;
                 user.PhoneNumber = userViewModel.PhoneNumber;
                 user.LockoutEnabled = userViewModel.LockoutEnabled;
@@ -259,17 +251,14 @@ namespace IM.Identity.Web.Controllers
             }
         }
 
-        public async Task<string> SendEmailConfirmationTokenAsync(string userId, string subject)
+        private async Task<string> SendEmailConfirmation(string userId, string subject)
         {
+            var emailManager = new EmailManager(UserManager);
             var code = await UserManager.GenerateEmailConfirmationTokenAsync(userId);
-
             var callbackUrl = Url.Action("ConfirmEmail", "Account",
                new { userId = userId, code = code }, protocol: Request.Url.Scheme);
 
-            await UserManager.SendEmailAsync(userId, subject,
-               "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
-
-            return callbackUrl;
+            return await emailManager.SendConfirmationEmail(userId, subject, callbackUrl);
         }
 
         #endregion
@@ -278,7 +267,11 @@ namespace IM.Identity.Web.Controllers
 
         protected override void Dispose(bool disposing)
         {
-            _usersRepository.Dispose();
+            if (disposing)
+            {
+                _usersRepository.Dispose();
+                _rolesRepository.Dispose();
+            }
 
             base.Dispose(disposing);
         }

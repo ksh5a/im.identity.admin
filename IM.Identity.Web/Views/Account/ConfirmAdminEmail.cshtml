@@ -6,8 +6,7 @@
 <h2>@ViewBag.Title.</h2>
 <div>
     <p>
-        @ViewResource.ConfirmEmailText
-
-        <a href="@ViewBag.SetupPassword">@ViewResource.SetupPasswordUrl</a>
+        @ViewResource.ConfirmAdminEmailText
+        @Html.ActionLink(@ViewResource.LoginFormLink, "Login", "Account")
     </p>
 </div>

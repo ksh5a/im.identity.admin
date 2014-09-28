@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using SendGrid;
@@ -17,15 +14,15 @@ namespace IM.Identity.Email.Services
         {
             var myMessage = new SendGridMessage();
             myMessage.AddTo(message.Destination);
-            myMessage.From = new System.Net.Mail.MailAddress("Joe@contoso.com", "Joe S.");
+            myMessage.From = new System.Net.Mail.MailAddress(ConfigurationManager.AppSettings["MailAdmin"]);
             myMessage.Subject = message.Subject;
             myMessage.Text = message.Body;
             myMessage.Html = message.Body;
 
             var credentials = new NetworkCredential
             (
-                ConfigurationManager.AppSettings["mailAccount"],
-                ConfigurationManager.AppSettings["mailPassword"]
+                ConfigurationManager.AppSettings["SendGridAccount"],
+                ConfigurationManager.AppSettings["SendGridPassword"]
             );
 
             // Create a Web transport for sending email.

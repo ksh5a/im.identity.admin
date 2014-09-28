@@ -70,6 +70,33 @@ namespace IM.Identity.Web.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Thank you for confirming your account. Please login to the website using the link below..
+        /// </summary>
+        public static string ConfirmAdminEmailText {
+            get {
+                return ResourceManager.GetString("ConfirmAdminEmailText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error has occured when confirming your email.
+        /// </summary>
+        public static string ConfirmEmailError {
+            get {
+                return ResourceManager.GetString("ConfirmEmailError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thank you for confirming your account. Please create a password clicking the link below..
+        /// </summary>
+        public static string ConfirmEmailText {
+            get {
+                return ResourceManager.GetString("ConfirmEmailText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Email.
         /// </summary>
         public static string Email {
@@ -79,11 +106,50 @@ namespace IM.Identity.Web.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+        ///&lt;head&gt;
+        ///    &lt;title&gt;Email Confirmation&lt;/title&gt;
+        ///    &lt;style&gt;
+        ///        .button {
+        ///            text-decoration: none;
+        ///            background-color: steelblue;
+        ///            color: white;
+        ///            padding: 4px 10px 4px 10px;
+        ///        }
+        ///
+        ///        .steelBlue {
+        ///            color: steelblue;
+        ///        }
+        ///    &lt;/style&gt;
+        ///&lt;/head&gt;
+        ///&lt;body&gt;
+        ///    &lt;h3&gt;
+        ///        Thank you for registering with &lt;span class=&quot;steelBlue&quot;&gt;Identity Manager&lt;/span&gt;.
+        ///    &lt;/h3&gt;
+        ///    Ple [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string EmailConfirmationTemplate {
+            get {
+                return ResourceManager.GetString("EmailConfirmationTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Email Confirmed.
         /// </summary>
         public static string EmailConfirmed {
             get {
                 return ResourceManager.GetString("EmailConfirmed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You do not have enough rights to access this page..
+        /// </summary>
+        public static string ErrorAccessDenied {
+            get {
+                return ResourceManager.GetString("ErrorAccessDenied", resourceCulture);
             }
         }
         
@@ -106,6 +172,47 @@ namespace IM.Identity.Web.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Login.
+        /// </summary>
+        public static string LoginFormLink {
+            get {
+                return ResourceManager.GetString("LoginFormLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+        ///&lt;head&gt;
+        ///    &lt;title&gt;Password Reset&lt;/title&gt;
+        ///    &lt;style&gt;
+        ///        .button {
+        ///            text-decoration: none;
+        ///            background-color: steelblue;
+        ///            color: white;
+        ///            padding: 4px 10px 4px 10px;
+        ///        }
+        ///
+        ///        .steelBlue {
+        ///            color: steelblue;
+        ///        }
+        ///    &lt;/style&gt;
+        ///&lt;/head&gt;
+        ///&lt;body&gt;
+        ///    &lt;h3&gt;
+        ///        Hello,
+        ///    &lt;/h3&gt;
+        ///    Please reset your password by clicking on following button:
+        ///    &lt;br /&gt;
+        ///    &lt;br [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string PasswordResetTemplate {
+            get {
+                return ResourceManager.GetString("PasswordResetTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Phone.
         /// </summary>
         public static string Phone {
@@ -120,6 +227,24 @@ namespace IM.Identity.Web.Resources {
         public static string PhoneNumberConfirmed {
             get {
                 return ResourceManager.GetString("PhoneNumberConfirmed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thank you for registering. A request confirmation was send to your mail account. Please follow the provided link to confirm your registration..
+        /// </summary>
+        public static string RegisterConfirmationMessage {
+            get {
+                return ResourceManager.GetString("RegisterConfirmationMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create password.
+        /// </summary>
+        public static string SetupPasswordUrl {
+            get {
+                return ResourceManager.GetString("SetupPasswordUrl", resourceCulture);
             }
         }
         
