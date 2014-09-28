@@ -328,7 +328,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Controllers\Interface\" />
     <Folder Include="Views\BaseAccount\" />
     <Folder Include="Views\Setup\" />
   </ItemGroup>
