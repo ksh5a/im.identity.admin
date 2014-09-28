@@ -258,7 +258,7 @@
     <Content Include="Content\site\Layout.css.map">
       <DependentUpon>Layout.css</DependentUpon>
     </Content>
-    <Content Include="AppSettings.config.ignore" />
+    <Content Include="AppSettings.config" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\gridmvc.js" />
     <Content Include="Scripts\gridmvc.lang.ru.js" />
