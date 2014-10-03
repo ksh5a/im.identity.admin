@@ -8,41 +8,33 @@ namespace IM.Identity.Web.Tests.Controllers
     public class HomeControllerTest
     {
         [TestMethod]
-        public async void Index()
+        public void Index()
         {
             // Arrange
-            HomeController controller = new HomeController();
+            var controller = new HomeController();
 
             // Act
-            var result = await controller.Index();
+            var result = controller.Index();
 
             // Assert
             Assert.IsNotNull(result);
         }
 
         [TestMethod]
-        public void About()
+        public void Users()
         {
-            // Arrange
-            HomeController controller = new HomeController();
+            var controller = new UsersController();
+            var result = controller.Index() as ViewResult;
 
-            // Act
-            ViewResult result = controller.About() as ViewResult;
-
-            // Assert
-            Assert.AreEqual("Your application description page.", result.ViewBag.Message);
+            Assert.IsNotNull(result);
         }
 
         [TestMethod]
-        public void Contact()
+        public void Roles()
         {
-            // Arrange
-            HomeController controller = new HomeController();
+            var controller = new RolesController();
+            var result = controller.Index() as ViewResult;
 
-            // Act
-            ViewResult result = controller.Contact() as ViewResult;
-
-            // Assert
             Assert.IsNotNull(result);
         }
     }

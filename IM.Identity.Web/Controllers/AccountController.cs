@@ -1,11 +1,14 @@
-﻿using System.Linq;
+﻿using System.Configuration;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using IM.Identity.BI.Enums;
 using IM.Identity.BI.Models;
 using IM.Identity.BI.Repository.Interface;
 using IM.Identity.BI.Repository.NInject;
 using IM.Identity.Web.Code;
+using IM.Identity.Web.Code.Managers;
 using IM.Identity.Web.Resources;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -16,18 +19,12 @@ using Ninject;
 
 namespace IM.Identity.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = RoleConstants.AdminRoles)]
     public class AccountController : BaseAccountController
     {
-        #region Constants
-
-        private const string AdminRoleName = "Admin";
-
-        #endregion
-
         #region Members
 
-        private ApplicationSignInManager _signInManager;
+        private AppSignInManager _appSignInManager;
         private readonly IRoleIdentityRepository<IdentityRole> _rolesRepository;
         private readonly IUserIdentityRepository<ApplicationUser> _usersRepository;
 
@@ -40,10 +37,10 @@ namespace IM.Identity.Web.Controllers
             get { return HttpContext.GetOwinContext().Authentication; }
         }
 
-        public ApplicationSignInManager SignInManager
+        public AppSignInManager AppSignInManager
         {
-            get { return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>(); }
-            private set { _signInManager = value; }
+            get { return _appSignInManager ?? HttpContext.GetOwinContext().Get<AppSignInManager>(); }
+            private set { _appSignInManager = value; }
         }
 
         #endregion
@@ -55,8 +52,6 @@ namespace IM.Identity.Web.Controllers
             _usersRepository = kernel.Get<IUserIdentityRepository<ApplicationUser>>();
         }
 
-        //
-        // GET: /Account/Login
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
@@ -64,8 +59,6 @@ namespace IM.Identity.Web.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -76,6 +69,12 @@ namespace IM.Identity.Web.Controllers
                 var user = await UserManager.FindAsync(model.Email, model.Password);
                 if (user != null)
                 {
+                    if (!await AuthorizeAdminUser(user.Id))
+                    {
+                        ViewBag.ErrorMessage = ViewResource.ErrorAccessDenied;
+                        return View("Error");
+                    }
+
                     if (!await UserManager.IsEmailConfirmedAsync(user.Id))
                     {
                         await SendEmailConfirmation(user.Id, "Confirm your account - Resend");
@@ -87,7 +86,7 @@ namespace IM.Identity.Web.Controllers
 
                     // This doesn't count login failures towards account lockout
                     // To enable password failures to trigger account lockout, change to shouldLockout: true
-                    var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+                    var result = await AppSignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
                     switch (result)
                     {
                         case SignInStatus.Success:
@@ -120,11 +119,11 @@ namespace IM.Identity.Web.Controllers
         public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
         {
             // Require that the user has already logged in via username/password or external login
-            if (!await SignInManager.HasBeenVerifiedAsync())
+            if (!await AppSignInManager.HasBeenVerifiedAsync())
             {
                 return View("Error");
             }
-            var user = await UserManager.FindByIdAsync(await SignInManager.GetVerifiedUserIdAsync());
+            var user = await UserManager.FindByIdAsync(await AppSignInManager.GetVerifiedUserIdAsync());
             if (user != null)
             {
                 var code = await UserManager.GenerateTwoFactorTokenAsync(user.Id, provider);
@@ -150,7 +149,7 @@ namespace IM.Identity.Web.Controllers
             // If a user enters incorrect codes for a specified amount of time then the user account 
             // will be locked out for a specified amount of time. 
             // You can configure the account lockout settings in IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
+            var result = await AppSignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -169,7 +168,7 @@ namespace IM.Identity.Web.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
         {
-            var userId = await SignInManager.GetVerifiedUserIdAsync();
+            var userId = await AppSignInManager.GetVerifiedUserIdAsync();
             if (userId == null)
             {
                 return View("Error");
@@ -192,7 +191,7 @@ namespace IM.Identity.Web.Controllers
             }
 
             // Generate the token and send it
-            if (!await SignInManager.SendTwoFactorCodeAsync(model.SelectedProvider))
+            if (!await AppSignInManager.SendTwoFactorCodeAsync(model.SelectedProvider))
             {
                 return View("Error");
             }
@@ -204,12 +203,11 @@ namespace IM.Identity.Web.Controllers
             });
         }
 
-        //
-        // GET: /Account/Register
         [AllowAnonymous]
         public async Task<ActionResult> Register()
         {
-            var roleExists = await _rolesRepository.RoleExists(AdminRoleName);
+            // Self registration is active as long as the administrator was not created yet
+            var roleExists = await _rolesRepository.RoleExists(RoleConstants.AdminRoles);
             if (roleExists)
             {
                 return RedirectToAction("Index", "Home");
@@ -218,13 +216,12 @@ namespace IM.Identity.Web.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/Register
         [HttpPost]
-        [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+            // Self registration is active as long as the administrator was not created yet
             var roleExists = await _rolesRepository.RoleExists("Admin");
             if (roleExists)
             {
@@ -233,10 +230,10 @@ namespace IM.Identity.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var roleResult = await _rolesRepository.Insert(new IdentityRole(AdminRoleName));
+                var roleResult = await _rolesRepository.CreateAdministrationRoles();
                 if(!roleResult.Succeeded)
                 {
-                    AddErrors(new IdentityResult("Admin role could not be created"));
+                    AddErrors(new IdentityResult("Admin roles could not be created"));
                     return View(model);
                 }
 
@@ -244,7 +241,7 @@ namespace IM.Identity.Web.Controllers
                 var userResult = await UserManager.CreateAsync(user, model.Password);
                 if (userResult.Succeeded)
                 {
-                    var addToRoleResult = await _usersRepository.AddToRole(user.Id, AdminRoleName);
+                    var addToRoleResult = await _usersRepository.AddToRole(user.Id, RoleConstants.SuperAdminRole);
                     if(!addToRoleResult.Succeeded)
                     {
                         AddErrors(new IdentityResult("User could not be added to Admin role"));
@@ -268,8 +265,6 @@ namespace IM.Identity.Web.Controllers
             return View(model);
         }
 
-        //
-        // GET: /Account/ConfirmEmail
         [AllowAnonymous]
         public async Task<ActionResult> ConfirmEmail(string userId, string code)
         {
@@ -294,8 +289,6 @@ namespace IM.Identity.Web.Controllers
             }
         }
 
-        //
-        // GET: /Account/ConfirmAdminEmail
         [AllowAnonymous]
         public async Task<ActionResult> ConfirmAdminEmail(string userId, string code)
         {
@@ -305,7 +298,8 @@ namespace IM.Identity.Web.Controllers
             }
 
             var user = await _usersRepository.Get(userId);
-            if (!user.UserRoles.Select(x => x.Name).Contains(AdminRoleName))
+            var userAuthorized = await AuthorizeAdminUser(user.Id);
+            if (!userAuthorized)
             {
                 ViewBag.ErrorMessage = ViewResource.ErrorAccessDenied;
                 return View("Error");
@@ -323,16 +317,12 @@ namespace IM.Identity.Web.Controllers
             }
         }
 
-        //
-        // GET: /Account/ForgotPassword
         [AllowAnonymous]
         public ActionResult ForgotPassword()
         {
             return View();
         }
 
-        //
-        // POST: /Account/ForgotPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -362,16 +352,12 @@ namespace IM.Identity.Web.Controllers
             return View(model);
         }
 
-        //
-        // GET: /Account/ForgotPasswordConfirmation
         [AllowAnonymous]
         public ActionResult ForgotPasswordConfirmation()
         {
             return View();
         }
 	
-        //
-        // GET: /Account/ResetPassword
         [AllowAnonymous]
         public ActionResult ResetPassword(string code)
         {
@@ -382,8 +368,6 @@ namespace IM.Identity.Web.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/ResetPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -413,16 +397,12 @@ namespace IM.Identity.Web.Controllers
             return View(model);
         }
 
-        //
-        // GET: /Account/ResetPasswordConfirmation
         [AllowAnonymous]
         public ActionResult ResetPasswordConfirmation()
         {
             return View();
         }
 
-        //
-        // GET: /Account/SetupPassword
         [AllowAnonymous]
         public ActionResult SetupPassword(string code)
         {
@@ -430,11 +410,10 @@ namespace IM.Identity.Web.Controllers
             {
                 return View("Error");
             }
+
             return View();
         }
 
-        //
-        // POST: /Account/SetupPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -452,9 +431,13 @@ namespace IM.Identity.Web.Controllers
                 var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInAsync(user, isPersistent: false);
-
-                    return RedirectToAction("Index", "Home");
+                    if (await AuthorizeAdminUser(user.Id))
+                    {
+                        await SignInAsync(user, isPersistent: false);
+                        return RedirectToAction("Index", "Home");
+                    }
+                    
+                    return Redirect(ConfigurationManager.AppSettings["UserWebsiteUrl"]);
                 }
                 else
                 {
@@ -696,10 +679,10 @@ namespace IM.Identity.Web.Controllers
         {
             if (disposing)
             {
-                if (SignInManager != null)
+                if (AppSignInManager != null)
                 {
-                    SignInManager.Dispose();
-                    SignInManager = null;
+                    AppSignInManager.Dispose();
+                    AppSignInManager = null;
                 }
 
                 _usersRepository.Dispose();

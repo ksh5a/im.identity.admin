@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Net;
 using System.Web.Mvc;
+using IM.Identity.BI.Enums;
 using IM.Identity.BI.Repository.Interface;
 using IM.Identity.BI.Repository.NInject;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -9,6 +10,7 @@ using Ninject;
 
 namespace IM.Identity.Web.Controllers
 {
+    [Authorize(Roles = RoleConstants.AdminRoles)]
     public class RolesController : Controller
     {
         private readonly IIdentityRepository<IdentityRole> _rolesRepository;

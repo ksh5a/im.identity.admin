@@ -1,12 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using IM.Identity.BI.Repository.Interface;
-using IM.Identity.BI.Repository.NInject;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
-using Ninject;
 
 namespace IM.Identity.BI.Models
 {

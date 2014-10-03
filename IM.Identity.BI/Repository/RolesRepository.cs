@@ -1,7 +1,7 @@
-﻿using System.Data.Entity;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using IM.Identity.BI.Edm;
+using IM.Identity.BI.Enums;
 using IM.Identity.BI.Repository.Interface;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -71,6 +71,19 @@ namespace IM.Identity.BI.Repository
         public async Task<bool> RoleExists(string roleName)
         {
             var result = await _roleManager.RoleExistsAsync(roleName);
+
+            return result;
+        }
+
+        public async Task<IdentityResult> CreateAdministrationRoles()
+        {
+            var result = new IdentityResult();
+
+            var superAdminResult = await Insert(new IdentityRole(RoleConstants.SuperAdminRole));
+            if(superAdminResult.Succeeded)
+            {
+                result = await Insert(new IdentityRole(RoleConstants.AdminRole));
+            }
 
             return result;
         }

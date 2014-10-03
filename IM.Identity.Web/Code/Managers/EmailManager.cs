@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using IM.Identity.Web.Resources;
 
-namespace IM.Identity.Web.Code
+namespace IM.Identity.Web.Code.Managers
 {
     public class EmailManager
     {

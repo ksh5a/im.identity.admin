@@ -1,16 +1,12 @@
 ﻿using IM.Identity.BI.Edm;
 using IM.Identity.BI.Models;
-using IM.Identity.Web.Code;
+using IM.Identity.Web.Code.Managers;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.DataProtection;
-using Microsoft.Owin.Security.Google;
 using Owin;
 using System;
-using IM.Identity.Web.Models;
 
 namespace IM.Identity.Web
 {
@@ -22,7 +18,7 @@ namespace IM.Identity.Web
             // Configure the db context and user manager to use a single instance per request
             app.CreatePerOwinContext(ApplicationDbContext.Create);
             app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
-            app.CreatePerOwinContext<ApplicationSignInManager>(ApplicationSignInManager.Create);
+            app.CreatePerOwinContext<AppSignInManager>(AppSignInManager.Create);
 
             // Enable the application to use a cookie to store information for the signed in user
             // and to use a cookie to temporarily store information about a user logging in with a third party login provider

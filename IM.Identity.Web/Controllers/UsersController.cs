@@ -3,10 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Net;
 using System.Web.Mvc;
+using IM.Identity.BI.Enums;
 using IM.Identity.BI.Models;
 using IM.Identity.BI.Repository.Interface;
 using IM.Identity.BI.Repository.NInject;
-using IM.Identity.Web.Code;
+using IM.Identity.Web.Code.Managers;
 using IM.Identity.Web.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -14,6 +15,7 @@ using Ninject;
 
 namespace IM.Identity.Web.Controllers
 {
+    [Authorize (Roles = RoleConstants.AdminRoles)]
     public class UsersController : BaseAccountController
     {
         private readonly IUserIdentityRepository<ApplicationUser> _usersRepository;
@@ -26,8 +28,6 @@ namespace IM.Identity.Web.Controllers
             _rolesRepository = kernel.Get<IIdentityRepository<IdentityRole>>();
         }
 
-        // GET: Users
-        //[Authorize(Roles = "Admin")]
         public ActionResult Index()
         {
             var users = _usersRepository.Get();
@@ -35,7 +35,6 @@ namespace IM.Identity.Web.Controllers
             return View(users);
         }
 
-        // GET: Users/Details/5
         public async Task<ActionResult> Details(string id)
         {
             if (id == null)
@@ -66,7 +65,6 @@ namespace IM.Identity.Web.Controllers
             return View(userViewModel);
         }
 
-        // GET: Users/Create
         public ActionResult Create()
         {
             var userViewModel = new UserViewModel
