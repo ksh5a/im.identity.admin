@@ -7,7 +7,6 @@
 
 <div class="row">
 
-    <div class="col-md-8">
 
         <div class="row formLeftHeader">
             <div class="formInnerHeader">
@@ -63,20 +62,6 @@
         
     </div>
 
-    <div class="col-md-4">
-        
-        <div class="row formRightHeader">
-            <div class="formInnerHeader">
-                <h2 class="pageHeaderCaption">External Login</h2>
-            </div>
-        </div>
-
-        <section id="socialLoginForm">
-            @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { Action = "ExternalLogin", ReturnUrl = ViewBag.ReturnUrl })
-        </section>
-    </div>
-
-</div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
