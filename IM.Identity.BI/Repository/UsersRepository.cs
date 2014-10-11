@@ -71,21 +71,31 @@ namespace IM.Identity.BI.Repository
             return result;
         }
 
-        public async Task<IdentityResult> AddToRole(string userId, string roleName)
+        public async Task<IdentityResult> AddToRole(ApplicationUser user, string roleName)
         {
-            var result = await _userManager.AddToRolesAsync(userId, roleName);
-
+            var result = await _userManager.AddToRoleAsync(user.Id, roleName);
             return result;
         }
 
-        public async Task<IdentityResult> AddToRoles(string userId, IEnumerable<string> roleNames)
+        public async Task<IdentityResult> RemoveFromRole(ApplicationUser user, string roleName)
         {
-            var result = await _userManager.AddToRolesAsync(userId, roleNames.ToArray());
-
+            var result = await _userManager.RemoveFromRoleAsync(user.Id, roleName);
             return result;
         }
 
-        private IEnumerable<IdentityRole> GetUserRoles(string userId)
+        public async Task<IdentityResult> AddToRoles(ApplicationUser user, params string[] roleNames)
+        {
+            var result = await _userManager.AddToRolesAsync(user.Id, roleNames);
+            return result;
+        }
+
+        public async Task<IdentityResult> RemoveFromRoles(ApplicationUser user, params string[] roleNames)
+        {
+            var result = await _userManager.RemoveFromRolesAsync(user.Id, roleNames);
+            return result;
+        }
+
+        public IEnumerable<IdentityRole> GetUserRoles(string userId)
         {
             var kernel = new StandardKernel(new RepositoryModule());
             var rolesRepository = kernel.Get<IIdentityRepository<IdentityRole>>();

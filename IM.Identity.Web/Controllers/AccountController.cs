@@ -248,7 +248,7 @@ namespace IM.Identity.Web.Controllers
                 var userResult = await UserManager.CreateAsync(user, model.Password);
                 if (userResult.Succeeded)
                 {
-                    var addToRoleResult = await _usersRepository.AddToRole(user.Id, RoleConstants.SuperAdminRole);
+                    var addToRoleResult = await _usersRepository.AddToRoles(user, RoleConstants.SuperAdminRole);
                     if(!addToRoleResult.Succeeded)
                     {
                         AddErrors(new IdentityResult("User could not be added to Admin role"));

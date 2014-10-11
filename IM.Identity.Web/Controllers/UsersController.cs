@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Web.Mvc;
 using IM.Identity.BI.Enums;
+using IM.Identity.BI.Errors;
 using IM.Identity.BI.Models;
 using IM.Identity.BI.Repository.Interface;
 using IM.Identity.BI.Repository.NInject;
@@ -15,7 +16,7 @@ using Ninject;
 
 namespace IM.Identity.Web.Controllers
 {
-    [Authorize (Roles = RoleConstants.AdminRoles)]
+    [Authorize(Roles = RoleConstants.AdminRoles)]
     public class UsersController : BaseAccountController
     {
         private readonly IUserIdentityRepository<ApplicationUser> _usersRepository;
@@ -99,14 +100,12 @@ namespace IM.Identity.Web.Controllers
                 var result = await _usersRepository.Insert(user);
                 if (result.Succeeded)
                 {
-                    result = await _usersRepository.AddToRoles(user.Id, userViewModel.RoleViewModels.Where(x => x.HasRole).Select(x => x.RoleName));
-                    if (!result.Succeeded)
+                    if (!await UpdateUserRoles(userViewModel, user))
                     {
-                        AddErrors(new IdentityResult("User could not be added to roles"));
                         return View(userViewModel);
                     }
                 }
-                else 
+                else
                 {
                     ModelState.AddModelError("", result.Errors.First());
                     return View(userViewModel);
@@ -169,10 +168,8 @@ namespace IM.Identity.Web.Controllers
                 var result = await _usersRepository.Update(user);
                 if (result.Succeeded)
                 {
-                    result = await _usersRepository.AddToRoles(user.Id, userViewModel.RoleViewModels.Where(x => x.HasRole).Select(x => x.RoleName));
-                    if (!result.Succeeded)
+                    if (!await UpdateUserRoles(userViewModel, user))
                     {
-                        AddErrors(new IdentityResult("User could not be added to roles"));
                         return View(userViewModel);
                     }
 
@@ -232,19 +229,55 @@ namespace IM.Identity.Web.Controllers
             }
             else
             {
-                var allRoles = _rolesRepository.Get();
-                var userRoleIds = user.Roles.Select(x => x.RoleId);
+                var allRoles = _rolesRepository.Get().ToList();
+                var userRoles = _usersRepository.GetUserRoles(user.Id).ToList();
+
                 roleViewModels = (
                     from IdentityRole identityRole in allRoles
                     select new IdentityRoleViewModel
                     {
                         RoleId = identityRole.Id,
                         RoleName = identityRole.Name,
-                        HasRole = userRoleIds.Contains(identityRole.Id)
+                        HasRole = userRoles.Select(x => x.Id).Contains(identityRole.Id)
                     }).ToList();
             }
 
             return roleViewModels;
+        }
+
+        private async Task<bool> UpdateUserRoles(UserViewModel userViewModel, ApplicationUser user)
+        {
+            var addRoles = userViewModel.RoleViewModels.Where(x => x.HasRole).Select(x => x.RoleName).ToArray();
+
+            foreach (var role in addRoles)
+            {
+                var result = await _usersRepository.AddToRole(user, role);
+                var userAlreadyInRoleErrors = result.Errors.Any() &&
+                                              result.Errors.Select(x => x == RoleErrors.UserAlreadyInRole).Count() ==
+                                              result.Errors.Count();
+                if (!result.Succeeded && !userAlreadyInRoleErrors)
+                {
+                    AddErrors(new IdentityResult(result.Errors));
+                    return false;
+                }
+            }
+
+            var removeRoles = userViewModel.RoleViewModels.Where(x => !x.HasRole).Select(x => x.RoleName).ToArray();
+            foreach (var role in removeRoles)
+            {
+
+                var result = await _usersRepository.RemoveFromRole(user, role);
+                var userIsNotInRoleErrors = result.Errors.Any() &&
+                                            result.Errors.Select(x => x == RoleErrors.UserIsNotInRole).Count() ==
+                                            result.Errors.Count();
+                if (!result.Succeeded && !userIsNotInRoleErrors)
+                {
+                    AddErrors(new IdentityResult(result.Errors));
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         #region Helpers

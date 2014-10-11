@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNet.Identity.EntityFramework;
-
-namespace IM.Identity.Web.Models
+﻿namespace IM.Identity.Web.Models
 {
     public class IdentityRoleViewModel
     {
