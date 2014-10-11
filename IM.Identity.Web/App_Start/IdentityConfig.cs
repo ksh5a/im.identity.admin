@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Configuration;
 using IM.Identity.BI.Edm;
 using IM.Identity.BI.Models;
 using IM.Identity.BI.Repository.NInject;
@@ -8,7 +8,6 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
-using IM.Identity.Web.Models;
 using Ninject;
 
 namespace IM.Identity.Web
@@ -44,9 +43,15 @@ namespace IM.Identity.Web
             };
 
             // Configure user lockout defaults
+            int maxFailedAccessAttemptsBeforeLockout;
+            int.TryParse(ConfigurationManager.AppSettings["MaxFailedAccessAttemptsBeforeLockout"], out maxFailedAccessAttemptsBeforeLockout);
+
+            int defaultAccountLockoutTimeSpan;
+            int.TryParse(ConfigurationManager.AppSettings["DefaultAccountLockoutTimeSpan"], out defaultAccountLockoutTimeSpan);
+            
             manager.UserLockoutEnabledByDefault = true;
-            manager.DefaultAccountLockoutTimeSpan = TimeSpan.FromMinutes(5);
-            manager.MaxFailedAccessAttemptsBeforeLockout = 5;
+            manager.DefaultAccountLockoutTimeSpan = TimeSpan.FromMinutes(defaultAccountLockoutTimeSpan);
+            manager.MaxFailedAccessAttemptsBeforeLockout = maxFailedAccessAttemptsBeforeLockout;
 
             // Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the user
             // You can write your own provider and plug in here.
