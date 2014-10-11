@@ -237,7 +237,14 @@ namespace IM.Identity.Web.Controllers
                     return View(model);
                 }
 
-                var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser 
+                {
+                    Email = model.Email,
+                    UserName = model.Email, 
+                    FirstName = model.FirstName,
+                    LastName = model.LastName
+                };
+
                 var userResult = await UserManager.CreateAsync(user, model.Password);
                 if (userResult.Succeeded)
                 {

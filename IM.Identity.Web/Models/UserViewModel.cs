@@ -17,6 +17,16 @@ namespace IM.Identity.Web.Models
         public string Email { get; set; }
 
         [Required]
+        [StringLength(256, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 2)]
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [StringLength(256, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 2)]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; }
+
+        [Required]
         [Phone]
         [Display(Name = "Phone")]
         public string PhoneNumber { get; set; }
