@@ -1,7 +1,13 @@
-﻿@model IM.Identity.Web.Models.UserViewModel
+﻿@using IM.Identity.BI.Enums
+@model IM.Identity.Web.Models.UserViewModel
 
-@for (var i=0; i< Model.RoleViewModels.Count(); i++)
+@for (var i = 0; i < Model.RoleViewModels.Count(); i++)
 {
+    if (Model.RoleViewModels[i].RoleName == RoleConstants.SuperAdminRole)
+    {
+        continue;
+    }
+    
     <div class="form-group">
         @Html.Label(Model.RoleViewModels[i].RoleName, htmlAttributes: new { @class = "control-label col-md-5" })
 

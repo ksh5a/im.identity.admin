@@ -49,6 +49,13 @@ namespace IM.Identity.BI.Repository
             return result;
         }
 
+        public async Task<IdentityResult> Insert(string roleName)
+        {
+            var result = await Insert(new IdentityRole(roleName));
+
+            return result;
+        }
+
         public async Task<IdentityResult> Update(IdentityRole role)
         {
             var result = await _roleManager.UpdateAsync(role);
@@ -77,12 +84,11 @@ namespace IM.Identity.BI.Repository
 
         public async Task<IdentityResult> CreateAdministrationRoles()
         {
-            var result = new IdentityResult();
+            var result = await Insert(RoleConstants.SuperAdminRole);
 
-            var superAdminResult = await Insert(new IdentityRole(RoleConstants.SuperAdminRole));
-            if(superAdminResult.Succeeded)
+            if (result.Succeeded)
             {
-                result = await Insert(new IdentityRole(RoleConstants.AdminRole));
+                result = await Insert(RoleConstants.AdminRole);
             }
 
             return result;

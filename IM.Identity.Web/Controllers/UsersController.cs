@@ -230,7 +230,7 @@ namespace IM.Identity.Web.Controllers
             else
             {
                 var allRoles = _rolesRepository.Get().ToList();
-                var userRoles = _usersRepository.GetUserRoles(user.Id).ToList();
+                var userRoles = user.UserRoles;
 
                 roleViewModels = (
                     from IdentityRole identityRole in allRoles

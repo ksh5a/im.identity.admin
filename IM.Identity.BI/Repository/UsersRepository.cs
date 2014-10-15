@@ -95,7 +95,7 @@ namespace IM.Identity.BI.Repository
             return result;
         }
 
-        public IEnumerable<IdentityRole> GetUserRoles(string userId)
+        private IEnumerable<IdentityRole> GetUserRoles(string userId)
         {
             var kernel = new StandardKernel(new RepositoryModule());
             var rolesRepository = kernel.Get<IIdentityRepository<IdentityRole>>();

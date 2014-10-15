@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Net;
 using System.Web.Mvc;
@@ -25,6 +26,7 @@ namespace IM.Identity.Web.Controllers
         public ActionResult Index()
         {
             var roles = _rolesRepository.Get();
+            ViewBag.SuperAdmin = HttpContext.User.IsInRole(RoleConstants.SuperAdminRole);
 
             return View(roles);
         }
@@ -41,6 +43,11 @@ namespace IM.Identity.Web.Controllers
             if (role == null)
             {
                 return HttpNotFound();
+            }
+
+            if (role.Name == RoleConstants.SuperAdminRole)
+            {
+                throw (new Exception("Operation not allowed"));
             }
 
             return View(role);
@@ -87,6 +94,12 @@ namespace IM.Identity.Web.Controllers
             {
                 return HttpNotFound();
             }
+
+            if (role.Name == RoleConstants.SuperAdminRole)
+            {
+                throw (new Exception("Operation not allowed"));
+            }
+
             return View(role);
         }
 
@@ -98,6 +111,11 @@ namespace IM.Identity.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "Id,Name")] IdentityRole role)
         {
+            if (role.Name == RoleConstants.SuperAdminRole)
+            {
+                throw (new Exception("Operation not allowed"));
+            }
+
             if (ModelState.IsValid)
             {
                 var result = await _rolesRepository.Update(role);
@@ -112,6 +130,7 @@ namespace IM.Identity.Web.Controllers
         }
 
         // GET: Roles/Delete/5
+        [Authorize(Roles = RoleConstants.AdminRoles)]
         public async Task<ActionResult> Delete(string id)
         {
             if (id == null)
@@ -120,10 +139,14 @@ namespace IM.Identity.Web.Controllers
             }
 
             var role = await _rolesRepository.Get(id);
-
             if (role == null)
             {
                 return HttpNotFound();
+            }
+
+            if (role.Name == RoleConstants.SuperAdminRole)
+            {
+                throw (new Exception("Operation not allowed"));
             }
 
             return View(role);
@@ -134,7 +157,13 @@ namespace IM.Identity.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(string id)
         {
-            var result = await _rolesRepository.Delete(id);
+            var role = await _rolesRepository.Get(id);
+            if (role.Name == RoleConstants.SuperAdminRole)
+            {
+                throw (new Exception("Operation not allowed"));
+            }
+
+            await _rolesRepository.Delete(id);
 
             return RedirectToAction("Index");
         }

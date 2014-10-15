@@ -241,4 +241,10 @@
 &lt;/body&gt;
 &lt;/html&gt;</value>
   </data>
+  <data name="InvalidActionError" xml:space="preserve">
+    <value>Invalid action</value>
+  </data>
+  <data name="UnconfirmedEmail" xml:space="preserve">
+    <value>You must have a confirmed email to log on. The confirmation token has been resent to your email account.</value>
+  </data>
 </root>

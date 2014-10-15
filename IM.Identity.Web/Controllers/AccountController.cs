@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -7,7 +8,6 @@ using IM.Identity.BI.Enums;
 using IM.Identity.BI.Models;
 using IM.Identity.BI.Repository.Interface;
 using IM.Identity.BI.Repository.NInject;
-using IM.Identity.Web.Code;
 using IM.Identity.Web.Code.Managers;
 using IM.Identity.Web.Resources;
 using Microsoft.AspNet.Identity;
@@ -69,19 +69,16 @@ namespace IM.Identity.Web.Controllers
                 var user = await UserManager.FindAsync(model.Email, model.Password);
                 if (user != null)
                 {
-                    if (!await AuthorizeAdminUser(user.Id))
+                    if (!await UserManager.AuthorizeAdminUser(user.Id))
                     {
-                        ViewBag.ErrorMessage = ViewResource.ErrorAccessDenied;
-                        return View("Error");
+                        throw (new Exception(ViewResource.ErrorAccessDenied));
                     }
 
                     if (!await UserManager.IsEmailConfirmedAsync(user.Id))
                     {
                         await SendEmailConfirmation(user.Id, "Confirm your account - Resend");
 
-                        ViewBag.ErrorMessage = "You must have a confirmed email to log on. "
-                                             + "The confirmation token has been resent to your email account.";
-                        return View("Error");
+                        throw (new Exception(ViewResource.UnconfirmedEmail));
                     }
 
                     // This doesn't count login failures towards account lockout
@@ -123,6 +120,7 @@ namespace IM.Identity.Web.Controllers
             {
                 return View("Error");
             }
+
             var user = await UserManager.FindByIdAsync(await AppSignInManager.GetVerifiedUserIdAsync());
             if (user != null)
             {
@@ -173,6 +171,7 @@ namespace IM.Identity.Web.Controllers
             {
                 return View("Error");
             }
+
             var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
             var factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
             return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
@@ -195,6 +194,7 @@ namespace IM.Identity.Web.Controllers
             {
                 return View("Error");
             }
+
             return RedirectToAction("VerifyCode", new
             {
                 Provider = model.SelectedProvider,
@@ -207,7 +207,7 @@ namespace IM.Identity.Web.Controllers
         public async Task<ActionResult> Register()
         {
             // Self registration is active as long as the administrator was not created yet
-            var roleExists = await _rolesRepository.RoleExists(RoleConstants.AdminRoles);
+            var roleExists = await _rolesRepository.RoleExists(RoleConstants.SuperAdminRole);
             if (roleExists)
             {
                 return RedirectToAction("Index", "Home");
@@ -222,7 +222,7 @@ namespace IM.Identity.Web.Controllers
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
             // Self registration is active as long as the administrator was not created yet
-            var roleExists = await _rolesRepository.RoleExists("Admin");
+            var roleExists = await _rolesRepository.RoleExists(RoleConstants.SuperAdminRole);
             if (roleExists)
             {
                 return RedirectToAction("Index", "Home");
@@ -291,8 +291,7 @@ namespace IM.Identity.Web.Controllers
             }
             else
             {
-                ViewBag.ErrorMessage = ViewResource.ConfirmEmailError;
-                return View("Error");
+                throw (new Exception(ViewResource.ConfirmEmailError));
             }
         }
 
@@ -305,11 +304,10 @@ namespace IM.Identity.Web.Controllers
             }
 
             var user = await _usersRepository.Get(userId);
-            var userAuthorized = await AuthorizeAdminUser(user.Id);
+            var userAuthorized = await UserManager.AuthorizeAdminUser(user.Id);
             if (!userAuthorized)
             {
-                ViewBag.ErrorMessage = ViewResource.ErrorAccessDenied;
-                return View("Error");
+                throw (new Exception(ViewResource.ErrorAccessDenied));
             }
 
             var result = await UserManager.ConfirmEmailAsync(userId, code);
@@ -319,8 +317,7 @@ namespace IM.Identity.Web.Controllers
             }
             else
             {
-                ViewBag.ErrorMessage = ViewResource.ConfirmEmailError;
-                return View("Error");
+                throw (new Exception(ViewResource.ConfirmEmailError));
             }
         }
 
@@ -438,7 +435,7 @@ namespace IM.Identity.Web.Controllers
                 var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
                 if (result.Succeeded)
                 {
-                    if (await AuthorizeAdminUser(user.Id))
+                    if (await UserManager.AuthorizeAdminUser(user.Id))
                     {
                         await SignInAsync(user, isPersistent: false);
                         return RedirectToAction("Index", "Home");

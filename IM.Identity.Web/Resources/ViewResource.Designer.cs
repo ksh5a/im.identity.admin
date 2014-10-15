@@ -154,6 +154,15 @@ namespace IM.Identity.Web.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid action.
+        /// </summary>
+        public static string InvalidActionError {
+            get {
+                return ResourceManager.GetString("InvalidActionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Lockout.
         /// </summary>
         public static string LockoutEnabled {
@@ -245,6 +254,15 @@ namespace IM.Identity.Web.Resources {
         public static string SetupPasswordUrl {
             get {
                 return ResourceManager.GetString("SetupPasswordUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must have a confirmed email to log on. The confirmation token has been resent to your email account..
+        /// </summary>
+        public static string UnconfirmedEmail {
+            get {
+                return ResourceManager.GetString("UnconfirmedEmail", resourceCulture);
             }
         }
         

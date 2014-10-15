@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Configuration;
+using System.Threading.Tasks;
 using IM.Identity.BI.Edm;
+using IM.Identity.BI.Enums;
 using IM.Identity.BI.Models;
 using IM.Identity.BI.Repository.NInject;
 using IM.Identity.Email.Services.Interface;
@@ -78,6 +80,14 @@ namespace IM.Identity.Web
             }
 
             return manager;
+        }
+
+        public async Task<bool> AuthorizeAdminUser(string userId)
+        {
+            var authorized = await IsInRoleAsync(userId, RoleConstants.SuperAdminRole) ||
+                await IsInRoleAsync(userId, RoleConstants.AdminRole);
+
+            return authorized;
         }
     }
 }
