@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using IM.Identity.BI.Enums;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 
@@ -31,6 +33,11 @@ namespace IM.Identity.BI.Models
             // Add custom user claims here
 
             return userIdentity;
+        }
+
+        public bool IsSuperAdmin()
+        {
+            return UserRoles.Select(role => role.Name).Contains(RoleConstants.SuperAdminRole);
         }
     }
 }

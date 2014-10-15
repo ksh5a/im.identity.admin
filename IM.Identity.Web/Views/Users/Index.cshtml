@@ -78,15 +78,19 @@
                     @Html.DisplayFor(modelItem => item.AccessFailedCount)
                 </td>
                 <td>
-                    
-                    @if (item.UserRoles.Select(role => role.Name).Contains(RoleConstants.SuperAdminRole))
+
+                    @if (!item.IsSuperAdmin())
                     {
-                        continue;
+                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <text> | </text>
+                        @Html.ActionLink("Details", "Details", new { id = item.Id }) <text> | </text>
+                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
                     }
-                    
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    else if (ViewBag.LoggedInUserIsSuperAdmin)
+                    {
+                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <text> | </text>
+                        @Html.ActionLink("Details", "Details", new { id = item.Id })
+                    }
+
                 </td>
             </tr>
             }

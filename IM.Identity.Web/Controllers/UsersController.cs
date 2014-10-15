@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Net;
@@ -32,6 +33,7 @@ namespace IM.Identity.Web.Controllers
         public ActionResult Index()
         {
             var users = _usersRepository.Get();
+            ViewBag.LoggedInUserIsSuperAdmin = HttpContext.User.IsInRole(RoleConstants.SuperAdminRole);
 
             return View(users);
         }
@@ -47,6 +49,11 @@ namespace IM.Identity.Web.Controllers
             if (user == null)
             {
                 return HttpNotFound();
+            }
+
+            if (user.IsSuperAdmin() && !HttpContext.User.IsInRole(RoleConstants.SuperAdminRole))
+            {
+                throw (new Exception("Operation not allowed"));
             }
 
             var userViewModel = new UserViewModel
@@ -133,6 +140,11 @@ namespace IM.Identity.Web.Controllers
                 return HttpNotFound();
             }
 
+            if (user.IsSuperAdmin() && !HttpContext.User.IsInRole(RoleConstants.SuperAdminRole))
+            {
+                throw (new Exception("Operation not allowed"));
+            }
+
             var userViewModel = new UserViewModel
             {
                 Id = user.Id,
@@ -158,6 +170,12 @@ namespace IM.Identity.Web.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _usersRepository.Get(userViewModel.Id);
+
+                if (user.IsSuperAdmin() && !HttpContext.User.IsInRole(RoleConstants.SuperAdminRole))
+                {
+                    throw (new Exception("Operation not allowed"));
+                }
+
                 user.UserName = userViewModel.Email;
                 user.Email = userViewModel.Email;
                 user.FirstName = userViewModel.FirstName;
@@ -197,6 +215,11 @@ namespace IM.Identity.Web.Controllers
             if (user == null)
             {
                 return HttpNotFound();
+            }
+
+            if (user.IsSuperAdmin())
+            {
+                throw (new Exception("Operation not allowed"));
             }
 
             return View(user);
@@ -247,6 +270,11 @@ namespace IM.Identity.Web.Controllers
 
         private async Task<bool> UpdateUserRoles(UserViewModel userViewModel, ApplicationUser user)
         {
+            if (user.IsSuperAdmin())
+            {
+                throw (new Exception("Operation not allowed"));
+            }
+
             var addRoles = userViewModel.RoleViewModels.Where(x => x.HasRole).Select(x => x.RoleName).ToArray();
 
             foreach (var role in addRoles)

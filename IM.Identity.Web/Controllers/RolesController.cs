@@ -26,7 +26,6 @@ namespace IM.Identity.Web.Controllers
         public ActionResult Index()
         {
             var roles = _rolesRepository.Get();
-            ViewBag.SuperAdmin = HttpContext.User.IsInRole(RoleConstants.SuperAdminRole);
 
             return View(roles);
         }
