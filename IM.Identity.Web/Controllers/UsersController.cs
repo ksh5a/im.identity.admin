@@ -9,7 +9,6 @@ using IM.Identity.BI.Errors;
 using IM.Identity.BI.Models;
 using IM.Identity.BI.Repository.Interface;
 using IM.Identity.BI.Repository.NInject;
-using IM.Identity.Web.Code.Managers;
 using IM.Identity.Web.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -21,13 +20,13 @@ namespace IM.Identity.Web.Controllers
     public class UsersController : BaseAccountController
     {
         private readonly IUserIdentityRepository<ApplicationUser> _usersRepository;
-        private readonly IIdentityRepository<IdentityRole> _rolesRepository;
+        private readonly IRoleIdentityRepository<IdentityRole> _rolesRepository;
 
         public UsersController()
         {
             var kernel = new StandardKernel(new RepositoryModule());
             _usersRepository = kernel.Get<IUserIdentityRepository<ApplicationUser>>();
-            _rolesRepository = kernel.Get<IIdentityRepository<IdentityRole>>();
+            _rolesRepository = kernel.Get<IRoleIdentityRepository<IdentityRole>>();
         }
 
         public ActionResult Index()
@@ -118,7 +117,7 @@ namespace IM.Identity.Web.Controllers
                     return View(userViewModel);
                 }
 
-                await SendEmailConfirmation(user.Id, "Confirm your account");
+                await SendEmailConfirmation(user.Id, "Confirm your account", "ConfirmEmail", "Account");
 
                 return RedirectToAction("Index");
             }
@@ -307,28 +306,6 @@ namespace IM.Identity.Web.Controllers
 
             return true;
         }
-
-        #region Helpers
-
-        private void AddErrors(IdentityResult result)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError("", error);
-            }
-        }
-
-        private async Task<string> SendEmailConfirmation(string userId, string subject)
-        {
-            var emailManager = new EmailManager(UserManager);
-            var code = await UserManager.GenerateEmailConfirmationTokenAsync(userId);
-            var callbackUrl = Url.Action("ConfirmEmail", "Account",
-               new { userId = userId, code = code }, protocol: Request.Url.Scheme);
-
-            return await emailManager.SendConfirmationEmail(userId, subject, callbackUrl);
-        }
-
-        #endregion
 
         #region IDisposable
 

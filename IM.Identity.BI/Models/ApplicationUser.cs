@@ -37,7 +37,7 @@ namespace IM.Identity.BI.Models
 
         public bool IsSuperAdmin()
         {
-            return UserRoles.Select(role => role.Name).Contains(RoleConstants.SuperAdminRole);
+            return UserRoles != null && UserRoles.Select(role => role.Name).Contains(RoleConstants.SuperAdminRole);
         }
     }
 }

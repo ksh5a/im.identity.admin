@@ -2,7 +2,7 @@
 
 namespace IM.Identity.Web.Models
 {
-    public class RegisterViewModel
+    public class InstallViewModel
     {
         [Required]
         [EmailAddress]

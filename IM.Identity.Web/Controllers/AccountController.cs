@@ -76,8 +76,6 @@ namespace IM.Identity.Web.Controllers
 
                     if (!await UserManager.IsEmailConfirmedAsync(user.Id))
                     {
-                        await SendEmailConfirmation(user.Id, "Confirm your account - Resend");
-
                         throw (new Exception(ViewResource.UnconfirmedEmail));
                     }
 
@@ -204,75 +202,6 @@ namespace IM.Identity.Web.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<ActionResult> Register()
-        {
-            // Self registration is active as long as the administrator was not created yet
-            var roleExists = await _rolesRepository.RoleExists(RoleConstants.SuperAdminRole);
-            if (roleExists)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [AllowAnonymous]
-        public async Task<ActionResult> Register(RegisterViewModel model)
-        {
-            // Self registration is active as long as the administrator was not created yet
-            var roleExists = await _rolesRepository.RoleExists(RoleConstants.SuperAdminRole);
-            if (roleExists)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            if (ModelState.IsValid)
-            {
-                var roleResult = await _rolesRepository.CreateAdministrationRoles();
-                if(!roleResult.Succeeded)
-                {
-                    AddErrors(new IdentityResult("Admin roles could not be created"));
-                    return View(model);
-                }
-
-                var user = new ApplicationUser 
-                {
-                    Email = model.Email,
-                    UserName = model.Email, 
-                    FirstName = model.FirstName,
-                    LastName = model.LastName
-                };
-
-                var userResult = await UserManager.CreateAsync(user, model.Password);
-                if (userResult.Succeeded)
-                {
-                    var addToRoleResult = await _usersRepository.AddToRoles(user, RoleConstants.SuperAdminRole);
-                    if(!addToRoleResult.Succeeded)
-                    {
-                        AddErrors(new IdentityResult("User could not be added to Admin role"));
-                        return View(model);
-                    }
-
-                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    await SendAdminEmailConfirmation(user.Id, "Confirm your account");
-
-                    ViewBag.Message = ViewResource.RegisterConfirmationMessage;
-                    return View("Info");
-                }
-                else
-                {
-                    AddErrors(userResult);
-                }
-            }
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
-        }
-
-        [AllowAnonymous]
         public async Task<ActionResult> ConfirmEmail(string userId, string code)
         {
             if (userId == null || code == null) 
@@ -288,32 +217,6 @@ namespace IM.Identity.Web.Controllers
                 ViewBag.SetupPassword = callbackUrl;
 
                 return View("ConfirmEmail");
-            }
-            else
-            {
-                throw (new Exception(ViewResource.ConfirmEmailError));
-            }
-        }
-
-        [AllowAnonymous]
-        public async Task<ActionResult> ConfirmAdminEmail(string userId, string code)
-        {
-            if (userId == null || code == null)
-            {
-                return View("Error");
-            }
-
-            var user = await _usersRepository.Get(userId);
-            var userAuthorized = await UserManager.AuthorizeAdminUser(user.Id);
-            if (!userAuthorized)
-            {
-                throw (new Exception(ViewResource.ErrorAccessDenied));
-            }
-
-            var result = await UserManager.ConfirmEmailAsync(userId, code);
-            if (result.Succeeded)
-            {
-                return View("ConfirmAdminEmail");
             }
             else
             {
@@ -561,14 +464,6 @@ namespace IM.Identity.Web.Controllers
             AuthenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, await user.GenerateUserIdentityAsync(UserManager));
         }
 
-        private void AddErrors(IdentityResult result)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError("", error);
-            }
-        }
-
         private bool HasPassword()
         {
             var user = UserManager.FindById(User.Identity.GetUserId());
@@ -579,25 +474,6 @@ namespace IM.Identity.Web.Controllers
             return false;
         }
 
-        private async Task<string> SendEmailConfirmation(string userId, string subject, string action)
-        {
-            var emailManager = new EmailManager(UserManager);
-            var code = await UserManager.GenerateEmailConfirmationTokenAsync(userId);
-            var callbackUrl = Url.Action(action, "Account",
-               new { userId = userId, code = code }, protocol: Request.Url.Scheme);
-
-            return await emailManager.SendConfirmationEmail(userId, subject, callbackUrl);
-        }
-
-        private async Task<string> SendEmailConfirmation(string userId, string subject)
-        {
-            return await SendEmailConfirmation(userId, subject, "ConfirmEmail");
-        }
-
-        private async Task<string> SendAdminEmailConfirmation(string userId, string subject)
-        {
-            return await SendEmailConfirmation(userId, subject, "ConfirmAdminEmail");
-        }
 
         public enum ManageMessageId
         {
