@@ -9,5 +9,11 @@ Identity Administrator is an user management application based on Microsoft Iden
 - Users and user roles management
 - User mail confirmation and password set-up
 
+## Configuration
+
+
+## Documentation
+[Wiki](https://github.com/RazvanPredescu/im.identity.admin/wiki)
+
 ## License
 [MS-PL License](https://github.com/RazvanPredescu/im.identity.admin/blob/master/LICENSE.md)
