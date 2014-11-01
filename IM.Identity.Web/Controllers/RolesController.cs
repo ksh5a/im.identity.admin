@@ -25,7 +25,7 @@ namespace IM.Identity.Web.Controllers
         // GET: Roles
         public ActionResult Index()
         {
-            var roles = _rolesRepository.Get();
+            var roles = _rolesRepository.Get().OrderBy(role => role.Name);
 
             return View(roles);
         }

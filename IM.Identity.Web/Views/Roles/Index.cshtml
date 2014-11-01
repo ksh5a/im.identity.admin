@@ -1,5 +1,7 @@
 ﻿@using IM.Identity.BI.Enums
 @using Microsoft.AspNet.Identity.EntityFramework
+@using GridMvc.Html
+
 @model IEnumerable<IdentityRole>
 
 @{
@@ -20,38 +22,19 @@
         <p>
             @Html.ActionLink("Create New", "Create")
         </p>
+        
+        @helper RenderActions(IdentityRole item)
+        {
+            <a href="@Url.Action("Edit", "Roles", new { id = item.Id }, null)" > Edit </a> <span>|</span>
+            <a href="@Url.Action("Details", "Roles", new { id = item.Id }, null)" > Details </a> <span>|</span>
+            <a href="@Url.Action("Delete", "Roles", new { id = item.Id }, null)" > Delete </a> <span>|</span>
+        }
 
-        <table class="table">
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-                <th></th>
-            </tr>
-
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td>
-                        
-                        @if (item.Name == RoleConstants.SuperAdminRole)
-                        {
-                            continue;
-                        }
-                        
-                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                        @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-
-                    </td>
-                </tr>
-            }
-
-        </table>
-
+        @Html.Grid(Model).Columns(columns =>
+        {
+            columns.Add(item => item.Name).Titled("Name").SetWidth(110).Sortable(true).Filterable(true);
+            columns.Add().Encoded(false).Sanitized(false).RenderValueAs(item => RenderActions(item));
+        }).WithPaging(10)
     </div>
 
 </div>

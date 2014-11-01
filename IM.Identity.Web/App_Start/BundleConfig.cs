@@ -23,11 +23,15 @@ namespace IM.Identity.Web
                       "~/Scripts/bootstrap.js",
                       "~/Scripts/respond.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/gridmvc").Include(
+                      "~/Scripts/gridmvc.min.js"));
+
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/metro-bootstrap.css",
                       "~/Content/font-awesome.css",
                       "~/Content/site/site.css",
-                      "~/Content/site/layout.css"));
+                      "~/Content/site/layout.css",
+                      "~/Content/Gridmvc.css"));
 
             // Set EnableOptimizations to false for debugging. For more information,
             // visit http://go.microsoft.com/fwlink/?LinkId=301862
