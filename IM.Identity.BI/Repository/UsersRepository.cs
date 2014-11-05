@@ -25,7 +25,7 @@ namespace IM.Identity.BI.Repository
 
         public IQueryable<ApplicationUser> Get()
         {
-            var users = _userManager.Users.OrderBy(user => user.LastName);
+            var users = _userManager.Users.OrderBy(user => user.UserName);
             foreach (var user in users)
             {
                 user.UserRoles = GetUserRoles(user.Id);

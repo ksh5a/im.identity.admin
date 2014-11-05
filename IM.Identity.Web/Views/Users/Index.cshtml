@@ -31,8 +31,6 @@
 
         @Html.Grid(Model).Columns(columns =>
         {
-            columns.Add(item => item.FirstName).Titled(ViewResource.FirstName).Sortable(true).Filterable(true);
-            columns.Add(item => item.LastName).Titled(ViewResource.LastName).Sortable(true).Filterable(true);
             columns.Add(item => item.Email).Titled(ViewResource.Email).Sortable(true).Filterable(true);
             columns.Add(item => item.EmailConfirmed).Titled(ViewResource.EmailConfirmed).Sortable(true).Filterable(true);
             columns.Add(item => item.PhoneNumber).Titled(ViewResource.Phone).Sortable(true).Filterable(true);

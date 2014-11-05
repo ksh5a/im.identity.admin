@@ -67,8 +67,6 @@ namespace IM.Identity.Web.Controllers
                 {
                     Email = model.Email,
                     UserName = model.Email,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName
                 };
 
                 var userResult = await UserManager.CreateAsync(user, model.Password);

@@ -12,13 +12,6 @@ namespace IM.Identity.BI.Models
     // please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public class ApplicationUser : IdentityUser
     {
-        #region Extra column mapping
-
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-
-        #endregion
-
         #region Properties
 
         public IEnumerable<IdentityRole> UserRoles { get; set; }

@@ -58,10 +58,8 @@ namespace IM.Identity.Web.Controllers
             var userViewModel = new UserViewModel
             {
                 Id = user.Id,
-                UserName = user.UserName,
+                UserName = user.Email,
                 Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
                 PhoneNumber = user.PhoneNumber,
                 LockoutEnabled = user.LockoutEnabled,
                 LockoutEndDateUtc = user.LockoutEndDateUtc,
@@ -97,8 +95,6 @@ namespace IM.Identity.Web.Controllers
                 {
                     UserName = userViewModel.Email,
                     Email = userViewModel.Email,
-                    FirstName = userViewModel.FirstName,
-                    LastName = userViewModel.LastName,
                     PhoneNumber = userViewModel.PhoneNumber,
                     LockoutEnabled = userViewModel.LockoutEnabled
                 };
@@ -147,10 +143,8 @@ namespace IM.Identity.Web.Controllers
             var userViewModel = new UserViewModel
             {
                 Id = user.Id,
-                UserName = user.UserName,
+                UserName = user.Email,
                 Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
                 PhoneNumber = user.PhoneNumber,
                 LockoutEnabled = user.LockoutEnabled,
                 RoleViewModels = GetRoleViewModels(user)
@@ -164,7 +158,7 @@ namespace IM.Identity.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,UserName,Email,FirstName,LastName,PhoneNumber,LockoutEnabled,RoleViewModels")] UserViewModel userViewModel)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,UserName,Email,PhoneNumber,LockoutEnabled,RoleViewModels")] UserViewModel userViewModel)
         {
             if (ModelState.IsValid)
             {
@@ -177,8 +171,6 @@ namespace IM.Identity.Web.Controllers
 
                 user.UserName = userViewModel.Email;
                 user.Email = userViewModel.Email;
-                user.FirstName = userViewModel.FirstName;
-                user.LastName = userViewModel.LastName;
                 user.PhoneNumber = userViewModel.PhoneNumber;
                 user.LockoutEnabled = userViewModel.LockoutEnabled;
 
