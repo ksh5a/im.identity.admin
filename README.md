@@ -14,17 +14,17 @@ Identity Administrator is an user management application based on Microsoft Iden
 
 - If you have full control on your SQL Server and you want to start from scratch.
 
-Run IM.Identity.DB.publish.sql script to create the default database. You have to adjust the lines that specify database location:
+Run [IM.Identity.DB.publish.sql] (https://github.com/RazvanPredescu/im.identity.admin/blob/master/IM.Identity.DB.publish.sql) script to create the default database. You have to adjust the lines that specify database location:
 
 ```sql
 :setvar DefaultDataPath "C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER12\MSSQL\DATA\"
 :setvar DefaultLogPath "C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER12\MSSQL\DATA\"
 ```
 
-- If you do not have the rights to create databases from scripts, create database manually and run IM.Identity.Tables.publish.sql
+- If you do not have the rights to create databases from scripts, create database manually and run [IM.Identity.Tables.publish.sql] (https://github.com/RazvanPredescu/im.identity.admin/blob/master/IM.Identity.Tables.publish.sql)
 script to create the required tables.
 
-In both scenarios, you have to create your own database user (principal) that will have access to the database. This user and his corresponding password
+In both above scenarios, you have to create your own database user (principal) that will have access to the database. This user and his corresponding password
 will be used in connection string in Web.config that application will use to access the database.
 
 - Publish website to IIS.
@@ -74,6 +74,14 @@ For a functional administration site, few things have to be configured.
 
 In Web.config several settings must be specified:
 
+<b>Connection string:</b>
+```asp
+  <connectionStrings>
+    <add name="DefaultConnection" connectionString="Data Source=.;Database=IM.Identity.Test.DB; User ID=youdatabaseuser; Password=yourdatabasepassword;Pooling=True" providerName="System.Data.SqlClient" />
+  </connectionStrings>
+ ```
+ 
+<b>Application settings:</b>
 ```asp	
 <appSettings file="AppSettings.config">
 	<!-- Website where users will be redirected after they set-up their password (login page) -->
