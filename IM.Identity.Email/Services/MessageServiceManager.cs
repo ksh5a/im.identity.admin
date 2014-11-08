@@ -14,8 +14,10 @@ namespace IM.Identity.Email.Services
             {
                 case "Smtp":
                     return new SmtpEmailService();
+
                 case "SendGrid":
                     return new SendGridEmailService();
+
                 default:
                     return new SmtpEmailService();
             }
@@ -29,6 +31,7 @@ namespace IM.Identity.Email.Services
             {
                 case "Twilio":
                     return new TwilioSmsService();
+
                 default:
                     return new TwilioSmsService();
             }

@@ -81,7 +81,7 @@ namespace IM.Identity.Web.Controllers
 
                     // This doesn't count login failures towards account lockout
                     // To enable password failures to trigger account lockout, change to shouldLockout: true
-                    var result = await AppSignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+                    var result = await AppSignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: user.LockoutEnabled);
                     switch (result)
                     {
                         case SignInStatus.Success:
@@ -150,8 +150,10 @@ namespace IM.Identity.Web.Controllers
             {
                 case SignInStatus.Success:
                     return RedirectToLocal(model.ReturnUrl);
+
                 case SignInStatus.LockedOut:
                     return View("Lockout");
+
                 case SignInStatus.Failure:
                 default:
                     ModelState.AddModelError("", "Invalid code.");
@@ -172,6 +174,7 @@ namespace IM.Identity.Web.Controllers
 
             var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
             var factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
+
             return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
@@ -272,6 +275,7 @@ namespace IM.Identity.Web.Controllers
             {
                 return View("Error");
             }
+
             return View();
         }
 
@@ -288,6 +292,7 @@ namespace IM.Identity.Web.Controllers
                     ModelState.AddModelError("", "No user found.");
                     return View();
                 }
+
                 IdentityResult result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
                 if (result.Succeeded)
                 {
@@ -367,7 +372,7 @@ namespace IM.Identity.Web.Controllers
                 : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
                 : message == ManageMessageId.RemoveLoginSuccess ? "The external login was removed."
                 : message == ManageMessageId.Error ? "An error has occurred."
-                : "";
+                : string.Empty;
             ViewBag.HasLocalPassword = HasPassword();
             ViewBag.ReturnUrl = Url.Action("Manage");
             return View();
@@ -402,7 +407,7 @@ namespace IM.Identity.Web.Controllers
             else
             {
                 // User does not have a password so remove any validation errors caused by a missing OldPassword field
-                ModelState state = ModelState["OldPassword"];
+                var state = ModelState["OldPassword"];
                 if (state != null)
                 {
                     state.Errors.Clear();
@@ -433,6 +438,7 @@ namespace IM.Identity.Web.Controllers
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut();
+
             return RedirectToAction("Index", "Home");
         }
 
@@ -471,6 +477,7 @@ namespace IM.Identity.Web.Controllers
             {
                 return user.PasswordHash != null;
             }
+
             return false;
         }
 
