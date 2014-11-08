@@ -76,5 +76,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Publish\IM.Identity.DB.Local.publish.xml" />
+    <None Include="Publish\IM.Identity.Tables.publish.sql" />
   </ItemGroup>
 </Project>
