@@ -3,6 +3,8 @@ im.identity.admin
 
 Identity Administrator is an user management application based on Microsoft Identity 2.0 framework. It provides easy administration to speed up ASP.NET projects that needs a way to manage users and user roles. 
 
+It can be used toghether with an already existing project (and its own database) in case you have to just run the script that will add the necessary tables, or can be the starting point of a new one.
+
 ## Features
 
 - One time super administrator installation 
