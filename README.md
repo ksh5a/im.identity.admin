@@ -108,3 +108,10 @@ In Web.config several settings must be specified:
  
 ## License
 [MS-PL License](https://github.com/RazvanPredescu/im.identity.admin/blob/master/LICENSE.md)
+
+## Reference
+
+Some of the implementation source code was inspired from the articles originally written by Rick Anderson
+
+- [Create a secure ASP.NET MVC 5 web app with log in, email confirmation and password reset](http://www.asp.net/mvc/overview/security/create-an-aspnet-mvc-5-web-app-with-email-confirmation-and-password-reset)
+- [ASP.NET MVC 5 app with SMS and email Two-Factor Authentication](http://www.asp.net/mvc/overview/security/aspnet-mvc-5-app-with-sms-and-email-two-factor-authentication)
