@@ -105,6 +105,8 @@ In Web.config several settings must be specified:
 </appSettings>
  ```
  
+Note: Sms Service is not required as long as two factor authentication is not enabled.
+ 
 ## License
 [MS-PL License](https://github.com/RazvanPredescu/im.identity.admin/blob/master/LICENSE.md)
 
