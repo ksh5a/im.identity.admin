@@ -9,8 +9,7 @@ It can be used toghether with an already existing project (and its own database)
 
 - One time super administrator installation 
 - Users and roles management
-- Email confirmation and user password setup
-- Two factor authentication
+- Email confirmation
 
 ## Installation
 
