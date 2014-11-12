@@ -15,15 +15,14 @@ It can be used toghether with an already existing project (and its own database)
 
 - If you have full control on your SQL Server and you want to start from scratch.
 
-Run [IM.Identity.DB.publish.sql] (https://github.com/RazvanPredescu/im.identity.admin/blob/master/IM.Identity.DB.publish.sql) script to create the default database. You have to adjust the lines that specify database location:
+Run [IM.Identity.DB.publish.sql] (https://github.com/RazvanPredescu/im.identity.admin/blob/master/IM.Identity.DB/Publish/IM.Identity.DB.publish.sql) script to create the default database. You have to adjust the lines that specify database location:
 
 ```sql
 :setvar DefaultDataPath "C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER12\MSSQL\DATA\"
 :setvar DefaultLogPath "C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER12\MSSQL\DATA\"
 ```
 
-- If you do not have the rights to create databases from scripts, create database manually and run [IM.Identity.Tables.publish.sql] (https://github.com/RazvanPredescu/im.identity.admin/blob/master/IM.Identity.Tables.publish.sql)
-script to create the required tables.
+- If you do not have the rights to create databases from scripts, create database manually and run [IM.Identity.Tables.publish.sql] (https://github.com/RazvanPredescu/im.identity.admin/blob/master/IM.Identity.DB/Publish/IM.Identity.Tables.publish.sql) script to create the required tables.
 
 In both above scenarios, you have to create your own database user (principal) that will have access to the database. This user and his corresponding password
 will be used in connection string in Web.config that application will use to access the database.
