@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using IM.Identity.BI.Enums;
@@ -56,39 +57,34 @@ namespace IM.Identity.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var roleResult = await _rolesRepository.CreateAdministrationRoles();
-                if (!roleResult.Succeeded)
+                var user = _usersRepository.Get().SingleOrDefault(x => x.Email == model.Email);
+                if(user == null)
                 {
-                    AddErrors(new IdentityResult("Admin roles could not be created"));
-                    return View(model);
-                }
-
-                var user = new ApplicationUser
-                {
-                    Email = model.Email,
-                    UserName = model.Email,
-                };
-
-                var userResult = await UserManager.CreateAsync(user, model.Password);
-                if (userResult.Succeeded)
-                {
-                    var addToRoleResult = await _usersRepository.AddToRoles(user, RoleConstants.SuperAdminRole);
-                    if (!addToRoleResult.Succeeded)
+                    user = new ApplicationUser
                     {
-                        AddErrors(new IdentityResult("User could not be added to Admin role"));
-                        return View(model);
-                    }
+                        Email = model.Email,
+                        UserName = model.Email,
+                    };
 
-                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
+                    var userResult = await UserManager.CreateAsync(user, model.Password);
+                    if (userResult.Succeeded)
+                    {
+                        await SendAdminEmailConfirmation(user.Id, "Confirm your account");
+
+                        ViewBag.Message = ViewResource.RegisterConfirmationMessage;
+                        return View("Info");
+                    }
+                    else
+                    {
+                        AddErrors(userResult);
+                    }
+                }
+                else
+                {
                     await SendAdminEmailConfirmation(user.Id, "Confirm your account");
 
                     ViewBag.Message = ViewResource.RegisterConfirmationMessage;
                     return View("Info");
-                }
-                else
-                {
-                    AddErrors(userResult);
                 }
             }
 
@@ -110,6 +106,25 @@ namespace IM.Identity.Web.Controllers
             }
 
             var user = await _usersRepository.Get(userId);
+
+            var roleExists = await _rolesRepository.RoleExists(RoleConstants.SuperAdminRole);
+            if (!roleExists)
+            {
+                var roleResult = await _rolesRepository.CreateAdministrationRoles();
+                if (!roleResult.Succeeded)
+                {
+                    AddErrors(new IdentityResult("Admin roles could not be created"));
+                    throw (new Exception(ViewResource.ConfirmEmailError));
+                }
+
+                var addToRoleResult = await _usersRepository.AddToRoles(user, RoleConstants.SuperAdminRole);
+                if (!addToRoleResult.Succeeded)
+                {
+                    AddErrors(new IdentityResult("User could not be added to Admin role"));
+                    throw (new Exception(ViewResource.ConfirmEmailError));
+                }
+            }
+
             var userAuthorized = await UserManager.AuthorizeAdminUser(user.Id);
             if (!userAuthorized)
             {
