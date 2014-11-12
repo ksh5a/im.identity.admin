@@ -21,12 +21,20 @@
         <p>
             @Html.ActionLink("Create New", "Create")
         </p>
-
+        
         @helper RenderActions(ApplicationUser item)
         {
-            <a href="@Url.Action("Edit", "Users", new { id = item.Id }, null)"> Edit </a> <span>|</span>
-            <a href="@Url.Action("Details", "Users", new { id = item.Id }, null)"> Details </a> <span>|</span>
-            <a href="@Url.Action("Delete", "Users", new { id = item.Id }, null)"> Delete </a> <span>|</span>
+            if (!item.IsSuperAdmin())
+            {
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <span>|</span>
+                @Html.ActionLink("Details", "Details", new { id = item.Id }) <span>|</span>
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            }
+            else if (ViewBag.LoggedInUserIsSuperAdmin)
+            {
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id })  <span>|</span>
+                @Html.ActionLink("Details", "Details", new { id = item.Id })
+            }
         }
 
         @Html.Grid(Model).Columns(columns =>
@@ -37,7 +45,7 @@
             columns.Add(item => item.LockoutEnabled).Titled(ViewResource.LockoutEnabled).Sortable(true).Filterable(true);
             columns.Add(item => item.AccessFailedCount).Titled(ViewResource.AccessFailedCount).Sortable(true).Filterable(true);
             columns.Add().Encoded(false).Sanitized(false).RenderValueAs(item => RenderActions(item));
-        }).WithPaging(10)
+        }).Selectable(false).WithPaging(10)
 
     </div>
 

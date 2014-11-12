@@ -22,19 +22,24 @@
         <p>
             @Html.ActionLink("Create New", "Create")
         </p>
-        
+
         @helper RenderActions(IdentityRole item)
-        {
-            <a href="@Url.Action("Edit", "Roles", new { id = item.Id }, null)" > Edit </a> <span>|</span>
-            <a href="@Url.Action("Details", "Roles", new { id = item.Id }, null)" > Details </a> <span>|</span>
-            <a href="@Url.Action("Delete", "Roles", new { id = item.Id }, null)" > Delete </a> <span>|</span>
-        }
+{
+    if (item.Name == RoleConstants.SuperAdminRole)
+    {
+        return;
+    }
+
+    <a href="@Url.Action("Edit", "Roles", new { id = item.Id }, null)"> Edit </a> <span>|</span>
+    <a href="@Url.Action("Details", "Roles", new { id = item.Id }, null)"> Details </a> <span>|</span>
+    <a href="@Url.Action("Delete", "Roles", new { id = item.Id }, null)"> Delete </a>
+}
 
         @Html.Grid(Model).Columns(columns =>
         {
             columns.Add(item => item.Name).Titled("Name").SetWidth(110).Sortable(true).Filterable(true);
             columns.Add().Encoded(false).Sanitized(false).RenderValueAs(item => RenderActions(item));
-        }).WithPaging(10)
+        }).Selectable(false).WithPaging(10)
     </div>
 
 </div>
