@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<mvcSiteMap xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="http://mvcsitemap.codeplex.com/schemas/MvcSiteMap-File-4.0"
+            xsi:schemaLocation="http://mvcsitemap.codeplex.com/schemas/MvcSiteMap-File-4.0 MvcSiteMapSchema.xsd">
+
+  <mvcSiteMapNode title="Home" controller="Home" action="Index">
+    <mvcSiteMapNode title="Users" controller="Users" action="Index"/>
+    
+    <mvcSiteMapNode title="Roles" controller="Roles" action="Index" key="Roles">
+      <mvcSiteMapNode title="Create" controller="Roles" action="Create"/>
+      <mvcSiteMapNode title="Details" controller="Roles" action="Details" preservedRouteParameters="id"/>
+      <mvcSiteMapNode title="Edit" controller="Roles" action="Edit" preservedRouteParameters="id"/>
+      <mvcSiteMapNode title="Delete" controller="Roles" action="Delete" preservedRouteParameters="id"/>
+    </mvcSiteMapNode>
+
+    <mvcSiteMapNode title="Users" controller="Users" action="Index" key="Users">
+      <mvcSiteMapNode title="Create" controller="Users" action="Create"/>
+      <mvcSiteMapNode title="Details" controller="Users" action="Details" preservedRouteParameters="id"/>
+      <mvcSiteMapNode title="Edit" controller="Users" action="Edit" preservedRouteParameters="id"/>
+      <mvcSiteMapNode title="Delete" controller="Users" action="Delete" preservedRouteParameters="id"/>
+    </mvcSiteMapNode>
+
+  </mvcSiteMapNode>
+
+</mvcSiteMap>

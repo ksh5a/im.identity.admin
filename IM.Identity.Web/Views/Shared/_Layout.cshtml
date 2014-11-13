@@ -18,12 +18,14 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink(@ViewResource.WebTitle, "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                <a href="@Url.Action("Index", "Home")">
+                    <img src="~/Content/images/Logo.png"/>
+                </a>
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    @* Menu ActionLinks goes here *@
-                </ul>
+                <div class="navbar-brand">
+                    @Html.MvcSiteMap().SiteMapPath()
+                </div>
                 @Html.Partial("_LoginPartial")
             </div>
         </div>
