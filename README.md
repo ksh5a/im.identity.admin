@@ -9,22 +9,20 @@ It can be used toghether with an already existing project (and its own database)
 
 - One time super administrator installation 
 - Users and roles management
-- Email confirmation and user password setup
-- Two factor authentication
+- Email confirmation
 
 ## Installation
 
 - If you have full control on your SQL Server and you want to start from scratch.
 
-Run [IM.Identity.DB.publish.sql] (https://github.com/RazvanPredescu/im.identity.admin/blob/master/IM.Identity.DB.publish.sql) script to create the default database. You have to adjust the lines that specify database location:
+Run [IM.Identity.DB.publish.sql] (https://github.com/RazvanPredescu/im.identity.admin/blob/master/IM.Identity.DB/Publish/IM.Identity.DB.publish.sql) script to create the default database. You have to adjust the lines that specify database location:
 
 ```sql
 :setvar DefaultDataPath "C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER12\MSSQL\DATA\"
 :setvar DefaultLogPath "C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER12\MSSQL\DATA\"
 ```
 
-- If you do not have the rights to create databases from scripts, create database manually and run [IM.Identity.Tables.publish.sql] (https://github.com/RazvanPredescu/im.identity.admin/blob/master/IM.Identity.Tables.publish.sql)
-script to create the required tables.
+- If you do not have the rights to create databases from scripts, create database manually and run [IM.Identity.Tables.publish.sql] (https://github.com/RazvanPredescu/im.identity.admin/blob/master/IM.Identity.DB/Publish/IM.Identity.Tables.publish.sql) script to create the required tables.
 
 In both above scenarios, you have to create your own database user (principal) that will have access to the database. This user and his corresponding password
 will be used in connection string in Web.config that application will use to access the database.
@@ -106,5 +104,14 @@ In Web.config several settings must be specified:
 </appSettings>
  ```
  
+Note: Sms Service is not required as long as two factor authentication is not enabled.
+ 
 ## License
 [MS-PL License](https://github.com/RazvanPredescu/im.identity.admin/blob/master/LICENSE.md)
+
+## Reference
+
+Some of the implementation source code was inspired from the articles originally written by Rick Anderson
+
+- [Create a secure ASP.NET MVC 5 web app with log in, email confirmation and password reset](http://www.asp.net/mvc/overview/security/create-an-aspnet-mvc-5-web-app-with-email-confirmation-and-password-reset)
+- [ASP.NET MVC 5 app with SMS and email Two-Factor Authentication](http://www.asp.net/mvc/overview/security/aspnet-mvc-5-app-with-sms-and-email-two-factor-authentication)
