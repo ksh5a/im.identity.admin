@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <Name>KriaSoft.AspNet.Identity.Database</Name>
+    <Name>IM.Identity.DB</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{c77afcbd-25b7-4500-92dc-1248edd6a89e}</ProjectGuid>
@@ -12,8 +12,8 @@
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
-    <RootNamespace>KriaSoft.AspNet.Identity.Database</RootNamespace>
-    <AssemblyName>KriaSoft.AspNet.Identity.Database</AssemblyName>
+    <RootNamespace>IM.Identity.DB</RootNamespace>
+    <AssemblyName>IM.Identity.DB</AssemblyName>
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
