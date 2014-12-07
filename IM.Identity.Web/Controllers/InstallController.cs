@@ -6,6 +6,7 @@ using IM.Identity.BI.Enums;
 using IM.Identity.BI.Models;
 using IM.Identity.BI.Repository.Interface;
 using IM.Identity.BI.Repository.NInject;
+using IM.Identity.Web.Code.Managers;
 using IM.Identity.Web.Models;
 using IM.Identity.Web.Resources;
 using Microsoft.AspNet.Identity;
@@ -92,9 +93,13 @@ namespace IM.Identity.Web.Controllers
             return View(model);
         }
 
-        private async Task<string> SendAdminEmailConfirmation(string userId, string subject)
+        private async Task SendAdminEmailConfirmation(string userId, string subject)
         {
-            return await SendEmailConfirmation(userId, subject, "ConfirmEmail", "Install");
+            var code = await UserManager.GenerateEmailConfirmationTokenAsync(userId);
+            var callbackUrl = Url.Action("ConfirmEmail", "Install", new { userId = userId, code = code }, protocol: Request.Url.Scheme);
+
+            var emailManager = new EmailManager(UserManager);
+            await emailManager.SendConfirmationEmail(userId, subject, callbackUrl);
         }
 
         [AllowAnonymous]

@@ -9,6 +9,7 @@ using IM.Identity.BI.Errors;
 using IM.Identity.BI.Models;
 using IM.Identity.BI.Repository.Interface;
 using IM.Identity.BI.Repository.NInject;
+using IM.Identity.Web.Code.Managers;
 using IM.Identity.Web.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -113,7 +114,11 @@ namespace IM.Identity.Web.Controllers
                     return View(userViewModel);
                 }
 
-                await SendEmailConfirmation(user.Id, "Confirm your account", "ConfirmEmail", "Account");
+                var code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+
+                var emailManager = new EmailManager(UserManager);
+                await emailManager.SendConfirmationEmail(user.Id, "Confirm your account", callbackUrl);
 
                 return RedirectToAction("Index");
             }
@@ -222,6 +227,19 @@ namespace IM.Identity.Web.Controllers
         public async Task<ActionResult> DeleteConfirmed(string id)
         {
             var result = await _usersRepository.Delete(id);
+
+            return RedirectToAction("Index");
+        }
+
+        [ValidateAntiForgeryToken]
+        [ChildActionOnly]
+        public async Task<ActionResult> SendEmailConfirmation(string id)
+        {
+            var code = await UserManager.GenerateEmailConfirmationTokenAsync(id);
+            var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = id, code = code }, protocol: Request.Url.Scheme);
+
+            var emailManager = new EmailManager(UserManager);
+            await emailManager.SendConfirmationEmail(id, "Confirm your account", callbackUrl);
 
             return RedirectToAction("Index");
         }

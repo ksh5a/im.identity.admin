@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using System.Web.Mvc;
 using IM.Identity.Web.Resources;
 
 namespace IM.Identity.Web.Code.Managers
@@ -12,22 +13,18 @@ namespace IM.Identity.Web.Code.Managers
             UserManager = userManager;
         }
 
-        public async Task<string> SendConfirmationEmail(string userId, string subject, string callbackUrl)
+        public async Task SendConfirmationEmail(string userId, string subject, string callbackUrl)
         {
             const string confirmUrlToken = "###EmailConfirmUrl###";
             var confirmUrl = ViewResource.EmailConfirmationTemplate.Replace(confirmUrlToken, callbackUrl);
             await UserManager.SendEmailAsync(userId, subject, confirmUrl);
-
-            return callbackUrl;
         }
 
-        public async Task<string> SendPasswordResetEmail(string userId, string subject, string callbackUrl)
+        public async Task SendPasswordResetEmail(string userId, string subject, string callbackUrl)
         {
             const string passwordResetUrlToken = "###PasswordResetUrl###";
             var confirmUrl = ViewResource.PasswordResetTemplate.Replace(passwordResetUrlToken, callbackUrl);
             await UserManager.SendEmailAsync(userId, subject, confirmUrl);
-
-            return callbackUrl;
         }
     }
 }

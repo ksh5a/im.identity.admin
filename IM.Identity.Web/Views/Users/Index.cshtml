@@ -36,16 +36,26 @@
                 @Html.ActionLink("Details", "Details", new { id = item.Id })
             }
         }
+        
+        @helper RenderSendEmailConfirmation(ApplicationUser item)
+        {
+            <span> @item.EmailConfirmed </span>
+            
+            if (item.EmailConfirmed)
+            {
+                @Html.ActionLink("Resend confirmation", "SendEmailConfirmation", new { id = item.Id })
+            }
+        }
 
         @Html.Grid(Model).Columns(columns =>
         {
-            columns.Add(item => item.Email).Titled(ViewResource.Email).Sortable(true).Filterable(true);
-            columns.Add(item => item.EmailConfirmed).Titled(ViewResource.EmailConfirmed).Sortable(true).Filterable(true);
-            columns.Add(item => item.PhoneNumber).Titled(ViewResource.Phone).Sortable(true).Filterable(true);
-            columns.Add(item => item.LockoutEnabled).Titled(ViewResource.LockoutEnabled).Sortable(true).Filterable(true);
-            columns.Add(item => item.AccessFailedCount).Titled(ViewResource.AccessFailedCount).Sortable(true).Filterable(true);
+            columns.Add(item => item.Email).Titled(ViewResource.Email);
+            columns.Add(item => item.EmailConfirmed).Titled(ViewResource.EmailConfirmed).RenderValueAs(item => RenderSendEmailConfirmation(item)).Encoded(false).Sanitized(false);
+            columns.Add(item => item.PhoneNumber).Titled(ViewResource.Phone);
+            columns.Add(item => item.LockoutEnabled).Titled(ViewResource.LockoutEnabled);
+            columns.Add(item => item.AccessFailedCount).Titled(ViewResource.AccessFailedCount);
             columns.Add().Encoded(false).Sanitized(false).RenderValueAs(item => RenderActions(item));
-        }).Selectable(false).WithPaging(10)
+        }).Selectable(false).WithPaging(10).Sortable(true).Filterable(true)
 
     </div>
 
